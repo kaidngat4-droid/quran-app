@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>غلاف القرآن</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Amiri&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:'Tajawal';
+background:
+linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+url("images/mosque.jpg") no-repeat center/cover;
+color:white;
+}
+
+/* الكرت */
+.card{
+text-align:center;
+padding:50px 30px;
+border-radius:20px;
+background:rgba(0,0,0,0.5);
+backdrop-filter:blur(10px);
+box-shadow:0 0 40px rgba(0,0,0,0.7);
+width:90%;
+max-width:420px;
+}
+
+/* العنوان */
+.title{
+font-family:'Amiri';
+font-size:42px;
+color:#FFD700;
+text-shadow:0 0 10px rgba(255,215,0,0.6);
+margin-bottom:10px;
+}
+
+/* وصف */
+.subtitle{
+font-size:18px;
+color:#ddd;
+margin-bottom:25px;
+}
+
+/* زر */
+.btn{
+background:linear-gradient(45deg,#0d6efd,#00c6ff);
+border:none;
+padding:12px 30px;
+border-radius:10px;
+color:white;
+font-size:16px;
+cursor:pointer;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.05);
+}
+
+/* توقيع */
+.dev{
+margin-top:30px;
+font-size:14px;
+color:#ccc;
+}
+
+.dev b{
+color:#FFD700;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="title">📖 القرآن الكريم</div>
+
+<div class="subtitle">
+مصحف كامل مع التلاوة الصوتية
+</div>
+
+<button class="btn" onclick="startApp()">ابدأ</button>
+
+<script>
+function startApp(){
+window.location.href = "index.html";
+}
+</script>
+
+<div class="dev">
+تصميم وتطوير <br>
+<b>D / Salah Al-ahdel</b>
+</div>
+
+</div>
+
+</body>
+</html>
