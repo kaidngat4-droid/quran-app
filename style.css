@@ -1,98 +1,179 @@
+/* ===== الخطوط ===== */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal&family=Amiri+Quran&display=swap');
+
 body{
-margin:0;
-font-family:'Tajawal', sans-serif;
-background:
-linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
-url("images/home-bg.jpg") no-repeat center center;
-background-size:cover;
-color:white;
+  margin:0;
+  font-family:'Tajawal', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color:white;
+  height:100vh;
+  overflow:hidden;
 }
 
-header{
-background:rgba(0,0,0,0.7);
-padding:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-backdrop-filter:blur(10px);
+/* ===== layout ===== */
+.app{
+  display:flex;
+  height:100vh;
 }
 
-header h2{
-margin:0;
-font-size:18px;
+/* ===== الشريط الجانبي للسور ===== */
+.sidebar{
+  width:220px;
+  background:rgba(0,0,0,0.5);
+  padding:10px;
+  overflow-y:auto;
 }
 
-select{
-padding:6px;
-border-radius:6px;
-border:none;
+.sidebar button{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:8px;
+  background:#ffffff22;
+  color:white;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.3s;
 }
 
-.container{
-display:flex;
-height:90vh;
+.sidebar button:hover{
+  background:#00c6ff;
 }
 
-/* قائمة السور */
-#surahList{
-width:30%;
-overflow:auto;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(10px);
+/* ===== المحتوى ===== */
+.content{
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
+  position:relative;
 }
 
-#surahList div{
-padding:12px;
-border-bottom:1px solid #444;
-cursor:pointer;
-transition:0.3s;
+/* اختيار القارئ */
+#readerSelect{
+  padding:8px;
+  border-radius:8px;
+  margin-bottom:10px;
+  width:200px;
 }
 
-#surahList div:hover{
-background:rgba(255,255,255,0.1);
+/* البحث */
+#search{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:15px;
+  font-size:16px;
 }
 
-/* عرض المصحف */
-#mushafView{
-flex:1;
-padding:20px;
-overflow:auto;
-background:rgba(0,0,0,0.5);
-backdrop-filter:blur(8px);
-}
-
-/* الآيات */
+/* ===== عرض الآيات ===== */
 .ayah{
-margin:12px 0;
-padding:12px;
-background:rgba(255,255,255,0.08);
-border-radius:10px;
-font-family:'Amiri', serif;
-font-size:20px;
-line-height:2;
+  font-family:'Amiri Quran', serif;
+  font-size:24px;
+  line-height:2.2;
+  padding:10px;
+  margin:8px 0;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  transition:0.3s;
 }
 
-/* زر الصوت */
-button{
-background:#198754;
-color:white;
-border:none;
-padding:6px 10px;
-margin-top:5px;
-border-radius:6px;
-cursor:pointer;
+.ayah:hover{
+  background:rgba(255,255,255,0.18);
 }
 
-/* تجاوب الجوال */
-@media(max-width:768px){
-.container{
-flex-direction:column;
+.num{
+  color:#FFD700;
+  margin-right:10px;
 }
-#surahList{
-width:100%;
-height:40%;
+
+/* آية نشطة */
+.active{
+  background:#00c6ff55;
+  border-right:5px solid #00c6ff;
 }
-#mushafView{
-height:60%;
+
+/* ===== آيات السجدة ===== */
+.sajda{
+  border-right:4px solid gold;
+  position:relative;
 }
+
+.sajda::after{
+  content:"🧎";
+  position:absolute;
+  left:10px;
+  opacity:0;
+  transition:0.3s;
+}
+
+.sajda:hover::after{
+  opacity:1;
+  transform:scale(1.4);
+}
+
+/* ===== مشغل الصوت ===== */
+.player{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:rgba(0,0,0,0.85);
+  padding:10px;
+  backdrop-filter:blur(8px);
+  z-index:999;
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:5px;
+}
+
+.controls button{
+  padding:10px;
+  border:none;
+  border-radius:50%;
+  background:#00c6ff;
+  color:white;
+  cursor:pointer;
+  font-size:18px;
+  transition:0.3s;
+}
+
+.controls button:hover{
+  transform:scale(1.2);
+}
+
+/* شريط التقدم */
+#progress{
+  width:100%;
+  margin-bottom:5px;
+  cursor:pointer;
+}
+
+/* الوقت */
+.time{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#ccc;
+}
+
+/* ===== scrollbar ناعم ===== */
+.sidebar::-webkit-scrollbar,
+.content::-webkit-scrollbar{
+  width:8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,0.3);
+  border-radius:4px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.content::-webkit-scrollbar-track{
+  background:transparent;
 }
