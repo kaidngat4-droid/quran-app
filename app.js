@@ -1,148 +1,186 @@
-/* ===============================
-   تطبيق القرآن الكريم النهائي
-   =============================== */
+const surahList = document.getElementById("surahList");
+const mushafView = document.getElementById("mushafView");
+const readerSelect = document.getElementById("readerSelect");
+const search = document.getElementById("search");
 
-let reader = "ar.alafasy";
-let currentAudio = null;
+const progress = document.getElementById("progress");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
 
-/* ===============================
-   تحميل القرآن
-   =============================== */
+let ayahs = [];
+let currentIndex = 0;
+let audio = new Audio();
+let isPlaying = false;
 
-async function loadQuran(){
-
-try{
-
-let res = await fetch("https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/quran.json");
-let quran = await res.json();
-
-window.quranData = quran;
-
-let list = document.getElementById("surahList");
-list.innerHTML = "";
-
-quran.forEach((s,i)=>{
-list.innerHTML += `
-<div onclick="openSurah(${i})">
-📖 ${i+1} - ${s.name}
-</div>
-`;
-});
-
-/* فتح آخر سورة */
-let last = localStorage.getItem("lastSurah");
-if(last){
-openSurah(last);
-}
-
-}catch(e){
-alert("❌ تأكد من الاتصال بالإنترنت");
-}
-
-}
-
-loadQuran();
-
-/* ===============================
-   تغيير القارئ
-   =============================== */
-
-function changeReader(){
-reader = document.getElementById("reader").value;
-}
-
-/* ===============================
-   فتح سورة (مصحح)
-   =============================== */
-
-function openSurah(index){
-
-let s = quranData[index];
-
-localStorage.setItem("lastSurah", index);
-
-let view = document.getElementById("mushafView");
-
-view.innerHTML = `<h2 style="text-align:center">${s.name}</h2>`;
-
-/* حل اختلاف البيانات */
-let ayahs = s.ayahs || s.verses || [];
-
-ayahs.forEach((a,i)=>{
-
-let text = a.text || a;
-
-view.innerHTML += `
-<div class="ayah">
-${text}
-<br>
-<span style="color:gold">(${i+1})</span>
-<br>
-<button onclick="playAyah(${index+1},${i+1})">🎧 تشغيل</button>
-</div>
-`;
-
-});
-
-}
-
-/* ===============================
-   تشغيل آية
-   =============================== */
-
-function playAyah(surah, ayah){
-
-if(!navigator.onLine){
-alert("📡 لا يوجد إنترنت");
-return;
-}
-
-let url = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reader}`;
-
-fetch(url)
+/* ================= تحميل السور ================= */
+fetch("https://api.alquran.cloud/v1/surah")
 .then(res => res.json())
 .then(data => {
+  data.data.forEach(surah => {
 
-if(currentAudio){
-currentAudio.pause();
-}
+    const btn = document.createElement("button");
+    btn.textContent = surah.name;
 
-currentAudio = new Audio(data.data.audio);
-currentAudio.play();
+    btn.onclick = () => loadSurah(surah.number);
 
-})
-.catch(()=>{
-alert("❌ فشل تشغيل الصوت");
+    surahList.appendChild(btn);
+  });
 });
 
+/* ================= تحميل سورة ================= */
+function loadSurah(num){
+
+  mushafView.innerHTML = "جاري التحميل...";
+
+  fetch(`https://api.alquran.cloud/v1/surah/${num}/${readerSelect.value}`)
+  .then(res => res.json())
+  .then(data => {
+
+    mushafView.innerHTML = `<h2>${data.data.name}</h2>`;
+    ayahs = data.data.ayahs;
+    currentIndex = 0;
+
+    displayAyahs();
+  });
 }
 
-/* ===============================
-   تشغيل سورة كاملة
-   =============================== */
+/* ================= عرض الآيات ================= */
+function displayAyahs(){
 
-function playFullSurah(surah){
+  ayahs.forEach((ayah, index) => {
 
-let s = String(surah).padStart(3,'0');
+    const div = document.createElement("div");
+    div.className = "ayah";
 
-if(currentAudio){
-currentAudio.pause();
+    div.innerHTML = `
+      ${ayah.text}
+      <span class="num">(${ayah.numberInSurah})</span>
+    `;
+
+    // آية سجدة
+    if(ayah.sajda){
+      div.classList.add("sajda");
+    }
+
+    // تشغيل عند الضغط
+    div.onclick = () => playAyah(index);
+
+    mushafView.appendChild(div);
+  });
 }
 
-currentAudio = new Audio(
-`https://cdn.islamic.network/quran/audio/128/${reader}/${s}.mp3`
-);
+/* ================= تشغيل آية ================= */
+function playAyah(index){
 
-currentAudio.play();
+  currentIndex = index;
 
+  audio.src = ayahs[index].audio;
+  audio.play();
+  isPlaying = true;
+
+  highlightAyah(index);
+
+  // تشغيل التالي تلقائي
+  audio.onended = () => {
+    nextAyah();
+  };
 }
 
-/* ===============================
-   إيقاف الصوت
-   =============================== */
+/* ================= التحكم ================= */
+function togglePlay(){
+  if(isPlaying){
+    audio.pause();
+    isPlaying = false;
+  }else{
+    audio.play();
+    isPlaying = true;
+  }
+}
 
-function stopAudio(){
-if(currentAudio){
-currentAudio.pause();
+function nextAyah(){
+  if(currentIndex + 1 < ayahs.length){
+    playAyah(currentIndex + 1);
+  }
 }
+
+function prevAyah(){
+  if(currentIndex > 0){
+    playAyah(currentIndex - 1);
+  }
 }
+
+/* ================= تمييز الآية ================= */
+function highlightAyah(index){
+
+  const all = document.querySelectorAll(".ayah");
+
+  all.forEach(a => a.classList.remove("active"));
+
+  if(all[index]){
+    all[index].classList.add("active");
+
+    // تمرير تلقائي
+    all[index].scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+}
+
+/* ================= شريط التقدم ================= */
+audio.ontimeupdate = () => {
+
+  if(audio.duration){
+    progress.value = (audio.currentTime / audio.duration) * 100;
+  }
+
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = formatTime(audio.duration);
+};
+
+// التحكم بالسحب
+progress.oninput = () => {
+  if(audio.duration){
+    audio.currentTime = (progress.value / 100) * audio.duration;
+  }
+};
+
+/* ================= تنسيق الوقت ================= */
+function formatTime(time){
+  if(!time) return "0:00";
+
+  let min = Math.floor(time / 60);
+  let sec = Math.floor(time % 60);
+
+  if(sec < 10) sec = "0" + sec;
+
+  return `${min}:${sec}`;
+}
+
+/* ================= البحث داخل السورة ================= */
+search.addEventListener("input", () => {
+
+  const value = search.value.trim();
+
+  if(value === ""){
+    mushafView.innerHTML = `<h2>السورة</h2>`;
+    displayAyahs();
+    return;
+  }
+
+  const filtered = ayahs.filter(a => a.text.includes(value));
+
+  mushafView.innerHTML = `<h2>نتائج البحث</h2>`;
+
+  filtered.forEach(ayah => {
+    const div = document.createElement("div");
+    div.className = "ayah";
+
+    div.innerHTML = `
+      ${ayah.text}
+      <span class="num">(${ayah.numberInSurah})</span>
+    `;
+
+    mushafView.appendChild(div);
+  });
+});
