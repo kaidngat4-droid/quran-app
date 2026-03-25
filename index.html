@@ -8,11 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal&family=Amiri+Quran&display=swap" rel="stylesheet">
 
 <style>
-
-/* ===== إعداد عام ===== */
-*{
-  box-sizing: border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -22,11 +18,9 @@ body{
   color:white;
 }
 
-/* ===== صفحة الغلاف ===== */
+/* الغلاف */
 #cover{
   position:fixed;
-  top:0;
-  left:0;
   width:100%;
   height:100%;
   display:flex;
@@ -36,7 +30,7 @@ body{
   background:
     linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
     url("images/mosque.jpg") no-repeat center/cover;
-  transition:opacity 0.6s ease;
+  transition:0.6s;
 }
 
 #cover.hidden{
@@ -44,112 +38,37 @@ body{
   pointer-events:none;
 }
 
-/* ===== كرت الغلاف ===== */
 .card{
-  position:relative;
   text-align:center;
   padding:55px 30px;
   border-radius:25px;
-
   background:rgba(0,0,0,0.55);
   backdrop-filter:blur(15px);
-
-  box-shadow:
-    0 0 60px rgba(0,0,0,0.8),
-    0 0 20px rgba(255,215,0,0.15);
-
-  width:90%;
-  max-width:420px;
 }
 
-/* ===== العنوان ===== */
 .title{
-  font-family:'Amiri', serif;
   font-size:44px;
   color:#FFD700;
-  text-shadow:0 0 10px rgba(255,215,0,0.7),0 0 25px rgba(255,215,0,0.4);
-  margin-bottom:10px;
+  font-family:'Amiri';
 }
 
-/* ===== وصف ===== */
 .subtitle{
-  font-size:18px;
-  color:#ddd;
-  margin-bottom:30px;
-  line-height:1.7;
+  margin:20px 0;
 }
 
-/* ===== زر الغلاف ===== */
 .btn{
-  position:relative;
-  overflow:hidden;
   background:linear-gradient(45deg,#0d6efd,#00c6ff);
   border:none;
-  padding:14px 35px;
-  border-radius:12px;
+  padding:12px 30px;
+  border-radius:10px;
   color:white;
-  font-size:17px;
   cursor:pointer;
-  box-shadow:0 5px 15px rgba(0,0,0,0.5),0 0 10px rgba(0,198,255,0.4);
-  transition:0.3s;
 }
 
-.btn::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:-100%;
-  width:100%;
-  height:100%;
-  background:linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition:0.5s;
-}
+/* التطبيق */
+#app{display:none;height:100vh}
+.app{display:flex;height:100%}
 
-.btn:hover::before{
-  left:100%;
-}
-
-.btn:hover{
-  transform:scale(1.08);
-}
-
-.btn:active{
-  transform:scale(0.96);
-}
-
-/* ===== توقيع ===== */
-.dev{
-  margin-top:35px;
-  font-size:14px;
-  color:#aaa;
-}
-
-.dev b{
-  color:#FFD700;
-  text-shadow:0 0 8px rgba(255,215,0,0.5);
-}
-
-/* ===== أنيميشن الغلاف ===== */
-@keyframes fadeUp{
-  from{opacity:0; transform:translateY(40px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-.card{animation: fadeUp 1.2s ease;}
-
-/* ===== التطبيق ===== */
-#app{
-  display:none;
-  height:100vh;
-}
-
-/* ===== layout ===== */
-.app{
-  display:flex;
-  height:100%;
-}
-
-/* sidebar */
 .sidebar{
   width:220px;
   background:rgba(0,0,0,0.5);
@@ -168,34 +87,23 @@ body{
   cursor:pointer;
 }
 
-.sidebar button:hover{
-  background:#00c6ff;
-}
+.sidebar button:hover{background:#00c6ff}
 
-/* content */
 .content{
   flex:1;
   padding:15px;
   overflow-y:auto;
 }
 
-/* reader */
-#readerSelect{
-  padding:8px;
-  border-radius:8px;
-  margin-bottom:10px;
-}
-
-/* search */
-#search{
+#readerSelect,#search{
   width:100%;
   padding:10px;
   border-radius:10px;
-  border:none;
   margin-bottom:10px;
+  border:none;
 }
 
-/* ayah */
+/* الآيات */
 .ayah{
   font-family:'Amiri Quran';
   font-size:24px;
@@ -204,42 +112,20 @@ body{
   margin:8px 0;
   border-radius:10px;
   background:rgba(255,255,255,0.08);
-  transition:0.3s;
 }
 
-.ayah:hover{
-  background:rgba(255,255,255,0.18);
-}
+.ayah:hover{background:rgba(255,255,255,0.18)}
 
-.num{
-  color:#FFD700;
-}
-
-/* active */
 .active{
   background:#00c6ff55;
   border-right:5px solid #00c6ff;
 }
 
-/* sajda */
 .sajda{
   border-right:4px solid gold;
-  position:relative;
 }
 
-.sajda::after{
-  content:"🧎";
-  position:absolute;
-  left:10px;
-  opacity:0;
-  transition:0.3s;
-}
-
-.sajda:hover::after{
-  opacity:1;
-}
-
-/* player */
+/* المشغل */
 .player{
   position:fixed;
   bottom:0;
@@ -262,85 +148,82 @@ body{
   color:white;
 }
 
-#progress{
-  width:100%;
-}
-
-.time{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-}
-
+#progress{width:100%}
 </style>
 </head>
 
 <body>
 
-<!-- صفحة الغلاف -->
+<!-- الغلاف -->
 <div id="cover">
   <div class="card">
     <div class="title">📖 القرآن الكريم</div>
-    <div class="subtitle">
-      مصحف كامل مع التلاوة الصوتية<br>
-      تجربة روحانية بتصميم عصري
-    </div>
+    <div class="subtitle">مصحف كامل مع التلاوة الصوتية</div>
     <button class="btn" onclick="startApp()">ابدأ الآن</button>
-    <div class="dev">
-      تصميم وتطوير <br>
-      <b>D / Salah Al-ahdel</b>
-    </div>
   </div>
 </div>
 
 <!-- التطبيق -->
 <div id="app">
 <div class="app">
+
   <div class="sidebar" id="surahList"></div>
+
   <div class="content">
+
+    <!-- قراء مدعومين -->
     <select id="readerSelect">
       <option value="ar.alafasy">العفاسي</option>
       <option value="ar.minshawi">المنشاوي</option>
       <option value="ar.abdulbasitmurattal">عبدالباسط</option>
+      <option value="ar.husary">الحصري</option>
+      <option value="ar.mahermuaiqly">ماهر المعيقلي</option>
+      <option value="ar.abdurrahmaansudais">السديس</option>
+      <option value="ar.ahmedajamy">أحمد العجمي</option>
+      <option value="ar.muhammadjibreel">محمد جبريل</option>
     </select>
+
     <input type="text" id="search" placeholder="🔎 بحث">
+
     <div id="mushafView"><h2>اختر سورة</h2></div>
+
   </div>
+
 </div>
 
 <div class="player">
   <div class="controls">
     <button onclick="prevAyah()">⏮</button>
-    <button onclick="togglePlay()">▶</button>
+    <button onclick="togglePlay()" id="playBtn">▶</button>
     <button onclick="nextAyah()">⏭</button>
   </div>
   <input type="range" id="progress">
-  <div class="time">
-    <span id="currentTime">0:00</span>
-    <span id="duration">0:00</span>
-  </div>
 </div>
+
 </div>
 
 <script>
-// ===== الغلاف =====
+
+// الغلاف
 function startApp(){
-  const cover = document.getElementById('cover');
-  cover.classList.add('hidden');
+  document.getElementById('cover').classList.add('hidden');
   setTimeout(()=>{
     document.getElementById('app').style.display='block';
   },600);
 }
 
-// ===== التطبيق الأصلي =====
-const surahList = document.getElementById("surahList");
-const mushafView = document.getElementById("mushafView");
-const readerSelect = document.getElementById("readerSelect");
-const search = document.getElementById("search");
+// عناصر
+const surahList=document.getElementById("surahList");
+const mushafView=document.getElementById("mushafView");
+const readerSelect=document.getElementById("readerSelect");
+const search=document.getElementById("search");
+const progress=document.getElementById("progress");
+const playBtn=document.getElementById("playBtn");
 
-let ayahs = [];
-let currentIndex = 0;
-let audio = new Audio();
+let ayahs=[];
+let currentIndex=0;
+let currentSurah=0;
+let audio=new Audio();
 
 // تحميل السور
 fetch("https://api.alquran.cloud/v1/surah")
@@ -356,16 +239,20 @@ fetch("https://api.alquran.cloud/v1/surah")
 
 // تحميل سورة
 function loadSurah(num){
+
+  currentSurah=num;
+
   fetch(`https://api.alquran.cloud/v1/surah/${num}/${readerSelect.value}`)
   .then(r=>r.json())
   .then(data=>{
+
     mushafView.innerHTML=`<h2>${data.data.name}</h2>`;
     ayahs=data.data.ayahs;
 
     ayahs.forEach((a,i)=>{
       let div=document.createElement("div");
       div.className="ayah";
-      div.innerHTML=`${a.text} <span class="num">(${a.numberInSurah})</span>`;
+      div.innerHTML=`${a.text} <span>(${a.numberInSurah})</span>`;
 
       if(a.sajda) div.classList.add("sajda");
 
@@ -373,14 +260,22 @@ function loadSurah(num){
 
       mushafView.appendChild(div);
     });
+
   });
 }
+
+// تغيير القارئ
+readerSelect.onchange=()=>{
+  if(currentSurah) loadSurah(currentSurah);
+};
 
 // تشغيل
 function playAyah(i){
   currentIndex=i;
   audio.src=ayahs[i].audio;
   audio.play();
+
+  playBtn.textContent="⏸";
 
   document.querySelectorAll(".ayah").forEach(a=>a.classList.remove("active"));
   document.querySelectorAll(".ayah")[i].classList.add("active");
@@ -389,20 +284,43 @@ function playAyah(i){
 // تحكم
 function nextAyah(){ if(currentIndex+1<ayahs.length) playAyah(currentIndex+1); }
 function prevAyah(){ if(currentIndex>0) playAyah(currentIndex-1); }
-function togglePlay(){ audio.paused?audio.play():audio.pause(); }
+
+function togglePlay(){
+  if(audio.paused){
+    audio.play();
+    playBtn.textContent="⏸";
+  }else{
+    audio.pause();
+    playBtn.textContent="▶";
+  }
+}
 
 // progress
-const progress=document.getElementById("progress");
 audio.ontimeupdate=()=>{
-  progress.value=(audio.currentTime/audio.duration)*100;
+  if(audio.duration){
+    progress.value=(audio.currentTime/audio.duration)*100;
+  }
 };
 
-// البحث داخل السورة
+progress.oninput=()=>{
+  if(audio.duration){
+    audio.currentTime=(progress.value/100)*audio.duration;
+  }
+};
+
+// البحث
 search.oninput=()=>{
-  let val=search.value;
+  let val=search.value.trim();
+
+  if(val===""){
+    if(currentSurah) loadSurah(currentSurah);
+    return;
+  }
+
   let filtered=ayahs.filter(a=>a.text.includes(val));
 
-  mushafView.innerHTML="<h2>نتائج</h2>";
+  mushafView.innerHTML="<h2>نتائج البحث</h2>";
+
   filtered.forEach(a=>{
     let d=document.createElement("div");
     d.className="ayah";
@@ -410,6 +328,7 @@ search.oninput=()=>{
     mushafView.appendChild(d);
   });
 };
+
 </script>
 
 </body>
