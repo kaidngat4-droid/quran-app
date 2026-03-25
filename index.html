@@ -8,19 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal&family=Amiri+Quran&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-  margin:0;
   font-family:'Tajawal', sans-serif;
-  overflow:hidden;
   background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
+  overflow:hidden;
 }
 
-/* الغلاف */
+/* ===== الغلاف ===== */
 #cover{
   position:fixed;
+  top:0; left:0;
   width:100%;
   height:100%;
   display:flex;
@@ -30,7 +30,7 @@ body{
   background:
     linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
     url("images/mosque.jpg") no-repeat center/cover;
-  transition:0.6s;
+  transition:opacity 0.6s ease;
 }
 
 #cover.hidden{
@@ -46,29 +46,68 @@ body{
   backdrop-filter:blur(15px);
 }
 
+/* العنوان */
 .title{
   font-size:44px;
   color:#FFD700;
   font-family:'Amiri';
+  margin-bottom:10px;
 }
 
+/* وصف */
 .subtitle{
   margin:20px 0;
+  font-size:18px;
+  color:#ddd;
 }
 
+/* زر الغلاف */
 .btn{
   background:linear-gradient(45deg,#0d6efd,#00c6ff);
   border:none;
-  padding:12px 30px;
-  border-radius:10px;
+  padding:14px 35px;
+  border-radius:12px;
   color:white;
+  font-size:17px;
   cursor:pointer;
+  margin-bottom:20px;
+  transition:0.3s;
 }
 
-/* التطبيق */
-#app{display:none;height:100vh}
-.app{display:flex;height:100%}
+.btn:hover{
+  transform:scale(1.08);
+}
 
+/* ===== توقيع المطور بسيط ===== */
+.dev{
+  text-align:center;
+  font-size:14px;
+  color:#bbb;
+}
+
+.dev span{
+  display:block;
+  margin-bottom:5px;
+}
+
+.dev b{
+  font-weight:700;
+  color:white;
+  font-size:16px;
+}
+
+/* ===== التطبيق ===== */
+#app{
+  display:none;
+  height:100vh;
+}
+
+.app{
+  display:flex;
+  height:100%;
+}
+
+/* sidebar */
 .sidebar{
   width:220px;
   background:rgba(0,0,0,0.5);
@@ -85,17 +124,22 @@ body{
   background:#ffffff22;
   color:white;
   cursor:pointer;
+  transition:0.3s;
 }
 
-.sidebar button:hover{background:#00c6ff}
+.sidebar button:hover{
+  background:#00c6ff;
+}
 
+/* content */
 .content{
   flex:1;
   padding:15px;
   overflow-y:auto;
 }
 
-#readerSelect,#search{
+/* reader */
+#readerSelect{
   width:100%;
   padding:10px;
   border-radius:10px;
@@ -103,7 +147,16 @@ body{
   border:none;
 }
 
-/* الآيات */
+/* search */
+#search{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
+}
+
+/* ayah */
 .ayah{
   font-family:'Amiri Quran';
   font-size:24px;
@@ -112,9 +165,13 @@ body{
   margin:8px 0;
   border-radius:10px;
   background:rgba(255,255,255,0.08);
+  cursor:pointer;
+  transition:0.3s;
 }
 
-.ayah:hover{background:rgba(255,255,255,0.18)}
+.ayah:hover{
+  background:rgba(255,255,255,0.18);
+}
 
 .active{
   background:#00c6ff55;
@@ -125,7 +182,7 @@ body{
   border-right:4px solid gold;
 }
 
-/* المشغل */
+/* player */
 .player{
   position:fixed;
   bottom:0;
@@ -146,9 +203,13 @@ body{
   border-radius:50%;
   background:#00c6ff;
   color:white;
+  cursor:pointer;
 }
 
-#progress{width:100%}
+#progress{
+  width:100%;
+  margin-top:8px;
+}
 </style>
 </head>
 
@@ -160,51 +221,45 @@ body{
     <div class="title">📖 القرآن الكريم</div>
     <div class="subtitle">مصحف كامل مع التلاوة الصوتية</div>
     <button class="btn" onclick="startApp()">ابدأ الآن</button>
+    <div class="dev">
+      <span>تصميم وتطوير</span>
+      <b>👨‍💻 D / Salah Al-ahdel</b>
+    </div>
   </div>
 </div>
 
 <!-- التطبيق -->
 <div id="app">
-<div class="app">
-
-  <div class="sidebar" id="surahList"></div>
-
-  <div class="content">
-
-    <!-- قراء مدعومين -->
-    <select id="readerSelect">
-      <option value="ar.alafasy">العفاسي</option>
-      <option value="ar.minshawi">المنشاوي</option>
-      <option value="ar.abdulbasitmurattal">عبدالباسط</option>
-      <option value="ar.husary">الحصري</option>
-      <option value="ar.mahermuaiqly">ماهر المعيقلي</option>
-      <option value="ar.abdurrahmaansudais">السديس</option>
-      <option value="ar.ahmedajamy">أحمد العجمي</option>
-      <option value="ar.muhammadjibreel">محمد جبريل</option>
-    </select>
-
-    <input type="text" id="search" placeholder="🔎 بحث">
-
-    <div id="mushafView"><h2>اختر سورة</h2></div>
-
+  <div class="app">
+    <div class="sidebar" id="surahList"></div>
+    <div class="content">
+      <select id="readerSelect">
+        <option value="ar.alafasy">العفاسي</option>
+        <option value="ar.minshawi">المنشاوي</option>
+        <option value="ar.abdulbasitmurattal">عبدالباسط</option>
+        <option value="ar.husary">الحصري</option>
+        <option value="ar.mahermuaiqly">ماهر المعيقلي</option>
+        <option value="ar.abdurrahmaansudais">السديس</option>
+        <option value="ar.ahmedajamy">أحمد العجمي</option>
+        <option value="ar.muhammadjibreel">محمد جبريل</option>
+      </select>
+      <input type="text" id="search" placeholder="🔎 بحث">
+      <div id="mushafView"><h2>اختر سورة</h2></div>
+    </div>
   </div>
 
-</div>
-
-<div class="player">
-  <div class="controls">
-    <button onclick="prevAyah()">⏮</button>
-    <button onclick="togglePlay()" id="playBtn">▶</button>
-    <button onclick="nextAyah()">⏭</button>
+  <div class="player">
+    <div class="controls">
+      <button onclick="prevAyah()">⏮</button>
+      <button onclick="togglePlay()" id="playBtn">▶</button>
+      <button onclick="nextAyah()">⏭</button>
+    </div>
+    <input type="range" id="progress">
   </div>
-  <input type="range" id="progress">
-</div>
-
 </div>
 
 <script>
-
-// الغلاف
+// ===== الغلاف =====
 function startApp(){
   document.getElementById('cover').classList.add('hidden');
   setTimeout(()=>{
@@ -212,7 +267,7 @@ function startApp(){
   },600);
 }
 
-// عناصر
+// ===== التطبيق =====
 const surahList=document.getElementById("surahList");
 const mushafView=document.getElementById("mushafView");
 const readerSelect=document.getElementById("readerSelect");
@@ -239,13 +294,10 @@ fetch("https://api.alquran.cloud/v1/surah")
 
 // تحميل سورة
 function loadSurah(num){
-
   currentSurah=num;
-
   fetch(`https://api.alquran.cloud/v1/surah/${num}/${readerSelect.value}`)
   .then(r=>r.json())
   .then(data=>{
-
     mushafView.innerHTML=`<h2>${data.data.name}</h2>`;
     ayahs=data.data.ayahs;
 
@@ -260,23 +312,18 @@ function loadSurah(num){
 
       mushafView.appendChild(div);
     });
-
   });
 }
 
 // تغيير القارئ
-readerSelect.onchange=()=>{
-  if(currentSurah) loadSurah(currentSurah);
-};
+readerSelect.onchange=()=>{ if(currentSurah) loadSurah(currentSurah); };
 
 // تشغيل
 function playAyah(i){
   currentIndex=i;
   audio.src=ayahs[i].audio;
   audio.play();
-
   playBtn.textContent="⏸";
-
   document.querySelectorAll(".ayah").forEach(a=>a.classList.remove("active"));
   document.querySelectorAll(".ayah")[i].classList.add("active");
 }
@@ -284,43 +331,18 @@ function playAyah(i){
 // تحكم
 function nextAyah(){ if(currentIndex+1<ayahs.length) playAyah(currentIndex+1); }
 function prevAyah(){ if(currentIndex>0) playAyah(currentIndex-1); }
-
-function togglePlay(){
-  if(audio.paused){
-    audio.play();
-    playBtn.textContent="⏸";
-  }else{
-    audio.pause();
-    playBtn.textContent="▶";
-  }
-}
+function togglePlay(){ audio.paused?audio.play():audio.pause(); }
 
 // progress
-audio.ontimeupdate=()=>{
-  if(audio.duration){
-    progress.value=(audio.currentTime/audio.duration)*100;
-  }
-};
-
-progress.oninput=()=>{
-  if(audio.duration){
-    audio.currentTime=(progress.value/100)*audio.duration;
-  }
-};
+audio.ontimeupdate=()=>{ if(audio.duration) progress.value=(audio.currentTime/audio.duration)*100; };
+progress.oninput=()=>{ if(audio.duration) audio.currentTime=(progress.value/100)*audio.duration; };
 
 // البحث
 search.oninput=()=>{
   let val=search.value.trim();
-
-  if(val===""){
-    if(currentSurah) loadSurah(currentSurah);
-    return;
-  }
-
+  if(val===""){ if(currentSurah) loadSurah(currentSurah); return; }
   let filtered=ayahs.filter(a=>a.text.includes(val));
-
   mushafView.innerHTML="<h2>نتائج البحث</h2>";
-
   filtered.forEach(a=>{
     let d=document.createElement("div");
     d.className="ayah";
@@ -328,7 +350,6 @@ search.oninput=()=>{
     mushafView.appendChild(d);
   });
 };
-
 </script>
 
 </body>
