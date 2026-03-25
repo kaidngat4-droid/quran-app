@@ -3,80 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 القرآن الكريم</title>
 
-<title>غلاف القرآن</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Amiri&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal&family=Amiri+Quran&display=swap" rel="stylesheet">
 
 <style>
 
 body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-font-family:'Tajawal';
-background:
-linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-url("images/mosque.jpg") no-repeat center/cover;
-color:white;
+  margin:0;
+  font-family:'Tajawal';
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
 }
 
-/* الكرت */
-.card{
-text-align:center;
-padding:50px 30px;
-border-radius:20px;
-background:rgba(0,0,0,0.5);
-backdrop-filter:blur(10px);
-box-shadow:0 0 40px rgba(0,0,0,0.7);
-width:90%;
-max-width:420px;
+/* layout */
+.app{
+  display:flex;
+  height:100vh;
 }
 
-/* العنوان */
-.title{
-font-family:'Amiri';
-font-size:42px;
-color:#FFD700;
-text-shadow:0 0 10px rgba(255,215,0,0.6);
-margin-bottom:10px;
+/* sidebar */
+.sidebar{
+  width:220px;
+  background:rgba(0,0,0,0.5);
+  padding:10px;
+  overflow-y:auto;
 }
 
-/* وصف */
-.subtitle{
-font-size:18px;
-color:#ddd;
-margin-bottom:25px;
+.sidebar button{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:8px;
+  background:#ffffff22;
+  color:white;
+  cursor:pointer;
 }
 
-/* زر */
-.btn{
-background:linear-gradient(45deg,#0d6efd,#00c6ff);
-border:none;
-padding:12px 30px;
-border-radius:10px;
-color:white;
-font-size:16px;
-cursor:pointer;
-box-shadow:0 5px 15px rgba(0,0,0,0.4);
-transition:0.3s;
+.sidebar button:hover{
+  background:#00c6ff;
 }
 
-.btn:hover{
-transform:scale(1.05);
+/* content */
+.content{
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
 }
 
-/* توقيع */
-.dev{
-margin-top:30px;
-font-size:14px;
-color:#ccc;
+/* reader */
+#readerSelect{
+  padding:8px;
+  border-radius:8px;
+  margin-bottom:10px;
 }
 
-.dev b{
-color:#FFD700;
+/* search */
+#search{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
+}
+
+/* ayah */
+.ayah{
+  font-family:'Amiri Quran';
+  font-size:24px;
+  line-height:2.2;
+  padding:10px;
+  margin:8px 0;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  transition:0.3s;
+}
+
+.ayah:hover{
+  background:rgba(255,255,255,0.18);
+}
+
+.num{
+  color:#FFD700;
+}
+
+/* active */
+.active{
+  background:#00c6ff55;
+  border-right:5px solid #00c6ff;
+}
+
+/* sajda */
+.sajda{
+  border-right:4px solid gold;
+  position:relative;
+}
+
+.sajda::after{
+  content:"🧎";
+  position:absolute;
+  left:10px;
+  opacity:0;
+  transition:0.3s;
+}
+
+.sajda:hover::after{
+  opacity:1;
+}
+
+/* player */
+.player{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:rgba(0,0,0,0.8);
+  padding:10px;
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+.controls button{
+  padding:10px;
+  border:none;
+  border-radius:50%;
+  background:#00c6ff;
+  color:white;
+}
+
+#progress{
+  width:100%;
+}
+
+.time{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
 }
 
 </style>
@@ -84,28 +150,125 @@ color:#FFD700;
 
 <body>
 
-<div class="card">
+<div class="app">
 
-<div class="title">📖 القرآن الكريم</div>
+  <!-- السور -->
+  <div class="sidebar" id="surahList"></div>
 
-<div class="subtitle">
-مصحف كامل مع التلاوة الصوتية
+  <!-- المحتوى -->
+  <div class="content">
+
+    <select id="readerSelect">
+      <option value="ar.alafasy">العفاسي</option>
+      <option value="ar.minshawi">المنشاوي</option>
+      <option value="ar.abdulbasitmurattal">عبدالباسط</option>
+    </select>
+
+    <input type="text" id="search" placeholder="🔎 بحث">
+
+    <div id="mushafView"><h2>اختر سورة</h2></div>
+
+  </div>
+
 </div>
 
-<button class="btn" onclick="startApp()">ابدأ</button>
+<!-- المشغل -->
+<div class="player">
+  <div class="controls">
+    <button onclick="prevAyah()">⏮</button>
+    <button onclick="togglePlay()">▶</button>
+    <button onclick="nextAyah()">⏭</button>
+  </div>
+
+  <input type="range" id="progress">
+
+  <div class="time">
+    <span id="currentTime">0:00</span>
+    <span id="duration">0:00</span>
+  </div>
+</div>
 
 <script>
-function startApp(){
-window.location.href = "index.html";
+
+const surahList = document.getElementById("surahList");
+const mushafView = document.getElementById("mushafView");
+const readerSelect = document.getElementById("readerSelect");
+const search = document.getElementById("search");
+
+let ayahs = [];
+let currentIndex = 0;
+let audio = new Audio();
+
+// تحميل السور
+fetch("https://api.alquran.cloud/v1/surah")
+.then(r=>r.json())
+.then(data=>{
+  data.data.forEach(s=>{
+    let btn=document.createElement("button");
+    btn.textContent=s.name;
+    btn.onclick=()=>loadSurah(s.number);
+    surahList.appendChild(btn);
+  });
+});
+
+// تحميل سورة
+function loadSurah(num){
+  fetch(`https://api.alquran.cloud/v1/surah/${num}/${readerSelect.value}`)
+  .then(r=>r.json())
+  .then(data=>{
+    mushafView.innerHTML=`<h2>${data.data.name}</h2>`;
+    ayahs=data.data.ayahs;
+
+    ayahs.forEach((a,i)=>{
+      let div=document.createElement("div");
+      div.className="ayah";
+      div.innerHTML=`${a.text} <span class="num">(${a.numberInSurah})</span>`;
+
+      if(a.sajda) div.classList.add("sajda");
+
+      div.onclick=()=>playAyah(i);
+
+      mushafView.appendChild(div);
+    });
+  });
 }
+
+// تشغيل
+function playAyah(i){
+  currentIndex=i;
+  audio.src=ayahs[i].audio;
+  audio.play();
+
+  document.querySelectorAll(".ayah").forEach(a=>a.classList.remove("active"));
+  document.querySelectorAll(".ayah")[i].classList.add("active");
+}
+
+// تحكم
+function nextAyah(){ if(currentIndex+1<ayahs.length) playAyah(currentIndex+1); }
+function prevAyah(){ if(currentIndex>0) playAyah(currentIndex-1); }
+function togglePlay(){ audio.paused?audio.play():audio.pause(); }
+
+// progress
+const progress=document.getElementById("progress");
+audio.ontimeupdate=()=>{
+  progress.value=(audio.currentTime/audio.duration)*100;
+};
+
+// البحث داخل السورة
+search.oninput=()=>{
+  let val=search.value;
+  let filtered=ayahs.filter(a=>a.text.includes(val));
+
+  mushafView.innerHTML="<h2>نتائج</h2>";
+  filtered.forEach(a=>{
+    let d=document.createElement("div");
+    d.className="ayah";
+    d.innerHTML=a.text;
+    mushafView.appendChild(d);
+  });
+};
+
 </script>
-
-<div class="dev">
-تصميم وتطوير <br>
-<b>D / Salah Al-ahdel</b>
-</div>
-
-</div>
 
 </body>
 </html>
