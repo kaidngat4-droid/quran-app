@@ -49,50 +49,48 @@ body{
 /* العنوان */
 .title{
   font-size:44px;
-  color:#FFD700;
   font-family:'Amiri';
+  color:#FFD700; /* لون العنوان */
   margin-bottom:10px;
 }
 
-/* وصف */
+/* وصف الغلاف */
 .subtitle{
   margin:20px 0;
   font-size:18px;
-  color:#ddd;
+  color:#EEEEEE; /* لون النص */
 }
 
 /* زر الغلاف */
 .btn{
-  background:linear-gradient(45deg,#0d6efd,#00c6ff);
+  background: linear-gradient(45deg,#FF5500,#FFAA00); /* تدرج ألوان جديد */
   border:none;
   padding:14px 35px;
   border-radius:12px;
-  color:white;
+  color:#FFFFFF; /* نص الزر */
   font-size:17px;
   cursor:pointer;
   margin-bottom:20px;
   transition:0.3s;
 }
-
 .btn:hover{
   transform:scale(1.08);
 }
 
-/* ===== توقيع المطور بسيط ===== */
+/* توقيع المطور */
 .dev{
   text-align:center;
   font-size:14px;
   color:#bbb;
 }
-
 .dev span{
   display:block;
   margin-bottom:5px;
+  color:#CCCCCC; /* لون النص البسيط */
 }
-
 .dev b{
   font-weight:700;
-  color:white;
+  color:#FFDD00; /* لون الاسم والإيموجي */
   font-size:16px;
 }
 
@@ -121,14 +119,13 @@ body{
   margin:5px 0;
   border:none;
   border-radius:8px;
-  background:#ffffff22;
-  color:white;
+  background:#333333; /* خلفية الأزرار */
+  color:#FFD700; /* نص الأزرار */
   cursor:pointer;
   transition:0.3s;
 }
-
 .sidebar button:hover{
-  background:#00c6ff;
+  background:#FFAA00; /* عند التحويم */
 }
 
 /* content */
@@ -145,6 +142,9 @@ body{
   border-radius:10px;
   margin-bottom:10px;
   border:none;
+  color:#000000; /* نص القارئ */
+  background:#FFD700; /* خلفية الاختيار */
+  font-weight:600;
 }
 
 /* search */
@@ -154,6 +154,9 @@ body{
   border-radius:10px;
   border:none;
   margin-bottom:10px;
+  color:#000000; /* نص البحث */
+  background:#FFDD00; /* خلفية البحث */
+  font-weight:600;
 }
 
 /* ayah */
@@ -164,20 +167,18 @@ body{
   padding:10px;
   margin:8px 0;
   border-radius:10px;
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.05); /* خلفية الآية */
+  color:#FFFFFF; /* نص الآية */
   cursor:pointer;
   transition:0.3s;
 }
-
 .ayah:hover{
-  background:rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.15);
 }
-
 .active{
-  background:#00c6ff55;
-  border-right:5px solid #00c6ff;
+  background:#FFAA0055;
+  border-right:5px solid #FFAA00;
 }
-
 .sajda{
   border-right:4px solid gold;
 }
@@ -201,8 +202,8 @@ body{
   padding:10px;
   border:none;
   border-radius:50%;
-  background:#00c6ff;
-  color:white;
+  background:#FFAA00; /* لون أزرار المشغل */
+  color:#000000; /* لون النص */
   cursor:pointer;
 }
 
@@ -259,15 +260,13 @@ body{
 </div>
 
 <script>
-// ===== الغلاف =====
+// الغلاف
 function startApp(){
   document.getElementById('cover').classList.add('hidden');
-  setTimeout(()=>{
-    document.getElementById('app').style.display='block';
-  },600);
+  setTimeout(()=>{document.getElementById('app').style.display='block';},600);
 }
 
-// ===== التطبيق =====
+// عناصر
 const surahList=document.getElementById("surahList");
 const mushafView=document.getElementById("mushafView");
 const readerSelect=document.getElementById("readerSelect");
@@ -300,16 +299,12 @@ function loadSurah(num){
   .then(data=>{
     mushafView.innerHTML=`<h2>${data.data.name}</h2>`;
     ayahs=data.data.ayahs;
-
     ayahs.forEach((a,i)=>{
       let div=document.createElement("div");
       div.className="ayah";
       div.innerHTML=`${a.text} <span>(${a.numberInSurah})</span>`;
-
       if(a.sajda) div.classList.add("sajda");
-
       div.onclick=()=>playAyah(i);
-
       mushafView.appendChild(div);
     });
   });
