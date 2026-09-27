@@ -1,0 +1,12 @@
+# Capacitor
+node_modules/
+android/
+ios/
+.capacitor/
+
+# Termux
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
