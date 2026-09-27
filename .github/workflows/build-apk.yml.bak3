@@ -27,21 +27,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Accept All Android Licenses
-      run: |
-        yes | sdkmanager --licenses || true
-        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      continue-on-error: true
-
     - name: Install Capacitor
       run: |
         npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
 
     - name: Create Android Project
       run: |
+        # حذف المجلد القديم
         rm -rf android
-        rm -f capacitor.config.json
         
+        # إنشاء ملفات Capacitor
         echo '{
           "appId": "com.salah.quranapp",
           "appName": "القرآن الكريم",
@@ -49,10 +44,12 @@ jobs:
           "bundledWebRuntime": false
         }' > capacitor.config.json
         
+        # إنشاء مجلد www ونسخ الملفات
         mkdir -p www
         cp index.html manifest.json sw.js quran.json style.css app.js www/ 2>/dev/null || true
         cp -r images www/ 2>/dev/null || true
         
+        # إضافة Android
         npx cap add android
 
     - name: Build APK
