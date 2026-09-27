@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js 20
       uses: actions/setup-node@v4
       with:
         node-version: '20'
@@ -26,27 +26,49 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 11076708
+
+    - name: Install Android SDK packages
+      run: |
+        sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        yes | sdkmanager --licenses || true
 
     - name: Install Capacitor dependencies
       run: |
         npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
 
-    - name: Copy web assets to Android
+    - name: Create Android project
+      run: |
+        npx cap init "القرآن الكريم" "com.salah.quranapp" --web-dir=.
+        npx cap add android
+
+    - name: Copy web assets
       run: |
         mkdir -p android/app/src/main/assets/public
-        cp -r index.html manifest.json sw.js quran.json style.css app.js images android/app/src/main/assets/public/ 2>/dev/null || true
+        cp index.html manifest.json sw.js quran.json style.css app.js android/app/src/main/assets/public/ 2>/dev/null || true
+        cp -r images android/app/src/main/assets/public/ 2>/dev/null || true
+        npx cap sync android
 
     - name: Grant execute permission for gradlew
-      run: chmod +x android/gradlew || true
+      run: chmod +x android/gradlew
 
-    - name: Build APK with Gradle
+    - name: Build Debug APK
       run: |
         cd android
-        gradle wrapper --gradle-version 8.9
-        ./gradlew assembleDebug
+        ./gradlew assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: quran-app-debug
         path: android/app/build/outputs/apk/debug/*.apk
+        if-no-files-found: error
+
+    - name: Upload APK (alternative path)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: android/app/build/outputs/logs/*.txt
+        if-no-files-found: ignore
