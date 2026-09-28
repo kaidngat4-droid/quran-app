@@ -42,23 +42,26 @@ jobs:
         run: |
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
 
+      - name: Copy Web Files to www
+        run: |
+          rm -rf www
+          mkdir -p www
+          cp index.html www/
+          cp app.js www/
+          cp style.css www/
+          cp quran.json www/
+          cp manifest.json www/
+          cp sw.js www/
+          [ -f cover-pro.html ] && cp cover-pro.html www/ || true
+          [ -d images ] && cp -r images www/ || true
+          echo "📁 محتوى www:"
+          ls -la www/
+
       - name: Create Android Project
         run: |
           rm -rf android
-          rm -f capacitor.config.json
-
-          echo '{
-            "appId": "com.salah.quranapp",
-            "appName": "القرآن الكريم",
-            "webDir": "www",
-            "bundledWebRuntime": false
-          }' > capacitor.config.json
-
-          mkdir -p www
-          cp index.html manifest.json sw.js quran.json style.css app.js www/ 2>/dev/null || true
-          cp -r images www/ 2>/dev/null || true
-
           npx cap add android
+          npx cap sync android
 
       - name: Build APK
         run: |
