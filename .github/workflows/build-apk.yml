@@ -41,16 +41,7 @@ jobs:
       - name: Install Capacitor
         run: |
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
-
-      - name: Install Splash Screen Plugin
-        run: |
           npm install @capacitor/splash-screen@6
-
-      - name: Generate Icons and Splash
-        run: |
-          npm install @capacitor/assets --save-dev
-          npx @capacitor/assets generate --android
-        continue-on-error: true
 
       - name: Copy Web Files to www
         run: |
@@ -72,6 +63,12 @@ jobs:
           rm -rf android
           npx cap add android
           npx cap sync android
+
+      - name: Generate Icons and Splash
+        run: |
+          npm install @capacitor/assets --save-dev
+          npx @capacitor/assets generate --android
+        continue-on-error: true
 
       - name: Build APK
         run: |
