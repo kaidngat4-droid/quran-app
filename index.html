@@ -40,6 +40,7 @@ body{font-family:'Tajawal', sans-serif;background: linear-gradient(135deg,#0f202
 <meta name="theme-color" content="#FFAA00">
 <link rel="icon" type="image/png" href="images/icon-192.png">
 <link rel="apple-touch-icon" href="images/icon-192.png">
+<script>function startApp(){var c=document.getElementById("cover");var a=document.getElementById("app");if(c)c.classList.add("hidden");if(a)a.style.display="block";if(typeof buildSurahList==="function"){try{buildSurahList()}catch(e){console.error(e)}}}</script>
 </head>
 <body>
 <div id="loading">⏳ جاري تحميل بيانات القرآن...</div>
@@ -87,8 +88,6 @@ function openDB(){return new Promise((resolve,reject)=>{const request=indexedDB.
 async function getAllSurahs(){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readonly');const store=tx.objectStore(STORE_NAME);const request=store.getAll();request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
 async function saveAllSurahs(surahs){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readwrite');const store=tx.objectStore(STORE_NAME);surahs.forEach(s=>store.put(s));tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
 async function getSurahById(id){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readonly');const store=tx.objectStore(STORE_NAME);const request=store.get(id);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
-async function initQuranData(){const existing=await getAllSurahs();if(existing&&existing.length===114){console.log('✅ بيانات القرآن موجودة مسبقاً');return existing;}document.getElementById('loading').style.display='block';try{const response=await fetch('quran.json');const data=await response.json();await saveAllSurahs(data);document.getElementById('loading').style.display='none';return data;}catch(err){document.getElementById('loading').style.display='none';alert('❌ خطأ: '+err.message);throw err;}}
-async function startApp(){await initQuranData();document.getElementById('cover').classList.add('hidden');setTimeout(()=>{document.getElementById('app').style.display='block';buildSurahList();},600);}
 const surahList=document.getElementById("surahList");const mushafView=document.getElementById("mushafView");const readerSelect=document.getElementById("readerSelect");const search=document.getElementById("search");const progress=document.getElementById("progress");const playBtn=document.getElementById("playBtn");
 let ayahs=[];let currentIndex=0;let currentSurah=0;let audio=new Audio();
 async function buildSurahList(){const surahs=await getAllSurahs();surahs.sort((a,b)=>a.id-b.id);surahList.innerHTML='';surahs.forEach(s=>{const btn=document.createElement("button");btn.textContent=`${s.id}. ${s.name}`;btn.onclick=()=>loadSurah(s.id);surahList.appendChild(btn);});}
@@ -143,5 +142,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script src="app.js"></script>
 </body>
 </html>
