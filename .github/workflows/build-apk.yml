@@ -53,6 +53,7 @@ jobs:
           cp quran.json www/
           cp manifest.json www/
           cp sw.js www/
+          cp settings.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
           echo "📁 محتوى www:"
