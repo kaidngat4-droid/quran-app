@@ -217,14 +217,13 @@ body.theme-blue #header,body.theme-blue #player,body.theme-blue #sidebar{backgro
     <span class="sidebar-title">📚 السور</span>
     <button id="closeSidebar" onclick="toggleSidebar()">✕</button>
   </div>
-  <input type="text" id="searchSurah" placeholder="🔎 ابحث عن سورة...">
-  <div style="display:flex;gap:8px;padding:0 15px 12px">
-    <button class="setting-btn" style="flex:1;font-size:13px;padding:10px 5px" onclick="closeSidebar(); setTimeout(openDailyWird, 200)">📖 وردي</button>
-    <button class="setting-btn" style="flex:1;font-size:13px;padding:10px 5px" onclick="closeSidebar(); setTimeout(openKhatmDua, 200)">🤲 الختم</button>
-    <button class="setting-btn" style="flex:1;font-size:12px;padding:10px 3px" onclick="closeSidebar(); setTimeout(openJuzList, 200)">📚 أجزاء</button>
-    <button class="setting-btn" style="flex:1;font-size:12px;padding:10px 3px" onclick="closeSidebar(); setTimeout(openHizbList, 200)">📖 أحزاب</button>
-    <button class="setting-btn" style="flex:1;font-size:12px;padding:10px 3px" onclick="closeSidebar(); setTimeout(openSajdaList, 200)">🕌 سجدات</button>
-    <button class="setting-btn" style="flex:1;font-size:12px;padding:10px 3px" onclick="closeSidebar(); setTimeout(openPrayerTimes, 200)">🕌 المواقيت</button>
+  <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;padding:0 15px 12px">
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openDailyWird, 200)">📖 وردي</button>
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openKhatmDua, 200)">🤲 الختم</button>
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openJuzList, 200)">📚 أجزاء</button>
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openHizbList, 200)">📖 أحزاب</button>
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openSajdaList, 200)">🕌 سجدات</button>
+    <button class="setting-btn" style="font-size:11px;padding:10px 3px;text-align:center" onclick="closeSidebar(); setTimeout(openPrayerTimes, 200)">🕌 المواقيت</button>
   </div>
   <div id="surahList"></div>
 </div>
