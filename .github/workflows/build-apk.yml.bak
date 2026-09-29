@@ -41,7 +41,6 @@ jobs:
       - name: Install Capacitor
         run: |
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
-          npm install @capacitor/splash-screen@6
 
       - name: Copy Web Files to www
         run: |
@@ -53,8 +52,6 @@ jobs:
           cp quran.json www/
           cp manifest.json www/
           cp sw.js www/
-          cp settings.js www/
-          cp extras.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
           echo "📁 محتوى www:"
@@ -65,12 +62,6 @@ jobs:
           rm -rf android
           npx cap add android
           npx cap sync android
-
-      - name: Generate Icons and Splash
-        run: |
-          npm install @capacitor/assets --save-dev
-          npx @capacitor/assets generate --android
-        continue-on-error: true
 
       - name: Build APK
         run: |

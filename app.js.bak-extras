@@ -6,34 +6,6 @@ const surahList = document.getElementById("surahList");
 const mushafView = document.getElementById("mushafView");
 const mushaf = document.getElementById("mushaf");
 const readerSelect = document.getElementById("readerSelect");
-
-/* جدول تحويل القراء إلى مصادر الصوت */
-const READER_SOURCES = {
-  "ar.alafasy":            { source: "islamic", id: "ar.alafasy" },
-  "ar.abdulbasitmurattal": { source: "everyayah", id: "Abdul_Basit_Murattal_192kbps" },
-  "ar.abdurrahmaansudais": { source: "everyayah", id: "Abdurrahmaan_As-Sudais_192kbps" },
-  "ar.abdullahbasfar":     { source: "everyayah", id: "Abdullah_Basfar_192kbps" },
-  "ar.husary":             { source: "everyayah", id: "Husary_128kbps" },
-  "ar.minshawi":           { source: "everyayah", id: "Minshawy_Murattal_128kbps" },
-  "ar.muhammadjibreel":    { source: "everyayah", id: "Muhammad_Jibreel_128kbps" },
-  "ar.mahermuaiqly":       { source: "everyayah", id: "Maher_AlMuaiqly_128kbps" },
-  "ar.shaatree":           { source: "everyayah", id: "Abu_Bakr_Ash-Shaatree_128kbps" },
-  "ar.hudhaify":           { source: "everyayah", id: "Hudhaify_128kbps" },
-  "ar.ahmedajamy":         { source: "everyayah", id: "Ahmed_ibn_Ali_al-Ajamy_128kbps" },
-  "ar.hanirifai":          { source: "everyayah", id: "Hani_Rifai_192kbps" },
-  "ar.muhammadayyoub":     { source: "everyayah", id: "Muhammad_Ayyoub_128kbps" },
-  "ar.aymanswoaid":        { source: "everyayah", id: "Ayman_Sowaid_64kbps" }
-};
-
-function buildAudioURL(readerId, surahNum, ayahNum, globalAyahNum) {
-  var info = READER_SOURCES[readerId] || READER_SOURCES["ar.alafasy"];
-  var padded = String(surahNum).padStart(3, "0") + String(ayahNum).padStart(3, "0");
-  if (info.source === "everyayah") {
-    return "https://everyayah.com/data/" + info.id + "/" + padded + ".mp3";
-  }
-  return "https://cdn.islamic.network/quran/audio/128/" + info.id + "/" + globalAyahNum + ".mp3";
-}
-
 const search = document.getElementById("search");
 const searchSurah = document.getElementById("searchSurah");
 const progress = document.getElementById("progress");
@@ -239,11 +211,8 @@ function displayAyahs(surahInfo) {
       <span class="bookmark ${isBookmarked ? 'active' : ''}">${isBookmarked ? '🔖' : ''}</span>
       ${ayah.text}
       <span class="num">${ayah.numberInSurah}</span>
-      <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
-        <button onclick="event.stopPropagation(); openTafsir(${currentSurah}, ${ayah.numberInSurah})" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📚 تفسير</button>
-        <button onclick="event.stopPropagation(); shareAyah('${typeof surahInfo !== "undefined" && surahInfo ? surahInfo.name : ""}', ${ayah.numberInSurah}, '${ayah.text.replace(/'/g, "\\'")}')" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📤 مشاركة</button>
-      </div>
     `;
+
     // ضغطة قصيرة: تشغيل
     let pressTimer;
     div.addEventListener("touchstart", () => {
@@ -293,7 +262,7 @@ function playAyah() {
   const ayahNum = ayahs[currentIndex].numberInSurah;
   const globalAyahNum = getGlobalAyahNumber(currentSurah, ayahNum);
   const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
-  const url = buildAudioURL(reader, currentSurah, ayahNum, globalAyahNum);
+  const url = `https://cdn.islamic.network/quran/audio/128/${reader}/${globalAyahNum}.mp3`;
 
   audio.src = url;
   audio.play().catch(e => console.warn("خطأ الصوت:", e));

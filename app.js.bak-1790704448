@@ -25,9 +25,9 @@ const READER_SOURCES = {
   "ar.aymanswoaid":        { source: "everyayah", id: "Ayman_Sowaid_64kbps" }
 };
 
-function buildAudioURL(readerId, surahNum, ayahNum, globalAyahNum) {
+function buildAudioURL(readerId, globalAyahNum) {
   var info = READER_SOURCES[readerId] || READER_SOURCES["ar.alafasy"];
-  var padded = String(surahNum).padStart(3, "0") + String(ayahNum).padStart(3, "0");
+  var padded = String(globalAyahNum).padStart(6, "0");
   if (info.source === "everyayah") {
     return "https://everyayah.com/data/" + info.id + "/" + padded + ".mp3";
   }
@@ -293,7 +293,7 @@ function playAyah() {
   const ayahNum = ayahs[currentIndex].numberInSurah;
   const globalAyahNum = getGlobalAyahNumber(currentSurah, ayahNum);
   const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
-  const url = buildAudioURL(reader, currentSurah, ayahNum, globalAyahNum);
+  const url = buildAudioURL(reader, globalAyahNum);
 
   audio.src = url;
   audio.play().catch(e => console.warn("خطأ الصوت:", e));
