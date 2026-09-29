@@ -317,18 +317,7 @@ function prevAyah() {
   if (currentIndex > 0) { currentIndex--; playAyah(); scrollToAyah(currentIndex); }
 }
 function nextAyah() {
-  if (currentIndex < ayahs.length - 1) {
-    currentIndex++;
-    playAyah();
-    scrollToAyah(currentIndex);
-    if (typeof checkJuzCompletion === "function" && ayahs[currentIndex]) {
-      checkJuzCompletion(currentSurah, ayahs[currentIndex].numberInSurah);
-    }
-  } else {
-    if (typeof checkJuzCompletion === "function" && ayahs[currentIndex]) {
-      checkJuzCompletion(currentSurah, ayahs[currentIndex].numberInSurah);
-    }
-  }
+  if (currentIndex < ayahs.length - 1) { currentIndex++; playAyah(); scrollToAyah(currentIndex); }
 }
 function togglePlay() {
   if (audio.paused) audio.play();

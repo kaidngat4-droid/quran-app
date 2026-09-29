@@ -55,6 +55,8 @@ jobs:
           cp sw.js www/
           cp settings.js www/
           cp extras.js www/
+          cp parts.js www/
+          cp prayer.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
           echo "📁 محتوى www:"
