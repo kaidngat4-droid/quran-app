@@ -261,7 +261,7 @@ function playAyah() {
 
   const ayahNum = ayahs[currentIndex].numberInSurah;
   const globalAyahNum = getGlobalAyahNumber(currentSurah, ayahNum);
-  const reader = readerSelect.value;
+  const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
   const url = `https://cdn.islamic.network/quran/audio/128/${reader}/${globalAyahNum}.mp3`;
 
   audio.src = url;
