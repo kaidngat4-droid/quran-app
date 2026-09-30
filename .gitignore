@@ -10,4 +10,29 @@ ios/
 # OS
 .DS_Store
 Thumbs.db
+
+# Mushaf images (كبيرة — تُجلب في CI)
 pages-img/
+
+# Built files (تُبنى في CI)
+www/
+
+# Backup files
+*.bak
+*.bak2
+*.bak3
+*.bak-*
+*.old
+
+# Temp scripts
+build-pages.py
+display-page-img.py
+fetch-pages.py
+fetch-pages.sh
+meta.json
+preview-*.jpg
+test-*.png
+temp-pages/
+
+# Images (temp)
+test-*.png
