@@ -42,6 +42,11 @@ jobs:
         run: |
           npm install --legacy-peer-deps
 
+      - name: Fetch Quran Page Images
+        run: |
+          python3 fetch-images.py
+        continue-on-error: true
+
       - name: Copy Web Files to www
         run: |
           rm -rf www
@@ -50,14 +55,17 @@ jobs:
           cp app.js www/
           cp style.css www/
           cp quran.json www/
+          cp pages.json www/
           cp manifest.json www/
           cp sw.js www/
           cp settings.js www/
           cp extras.js www/
           cp parts.js www/
           cp prayer.js www/
+          cp mushaf.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
+          [ -d pages-img ] && cp -r pages-img www/ || true
           echo "📁 محتوى www:"
           ls -la www/
 

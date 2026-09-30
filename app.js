@@ -153,7 +153,18 @@ function displaySurahList(surahs) {
    ============================================================ */
 async function loadSurah(num) {
   currentSurah = num;
-  mushafView.innerHTML = "<div style='text-align:center;padding:40px'><div class='spinner'></div><br>جاري التحميل...</div>";
+
+  // ✅ إذا كان وضع المصحف مفعّلاً
+  if (typeof MUSHAF_MODE !== "undefined" && MUSHAF_MODE) {
+    if (typeof displayPageBySurah === "function") {
+      // حدث الشريط العلوي
+      if (typeof updateBottomBar === "function") {
+        // سيحدث لاحقاً في displayPage
+      }
+      displayPageBySurah(num);
+      return;
+    }
+  }
 
   // تحديث الحالة النشطة في القائمة
   document.querySelectorAll(".surah-item").forEach(el => el.classList.remove("active"));
@@ -162,6 +173,11 @@ async function loadSurah(num) {
 
   localStorage.setItem("lastSurah", num);
   localStorage.setItem("lastReader", readerSelect.value);
+
+  // مسح الصفحة القديمة
+  if (mushafView) {
+    mushafView.innerHTML = "<div style='text-align:center;padding:40px'><div class='spinner'></div><br>جاري التحميل...</div>";
+  }
 
   if (navigator.onLine) {
     try {
@@ -172,7 +188,7 @@ async function loadSurah(num) {
       displayAyahs(data.data);
       return;
     } catch (e) {
-      console.warn("API فشل");
+      console.warn("API فشل، استخدام quran.json");
     }
   }
 

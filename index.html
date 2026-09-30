@@ -176,6 +176,239 @@ body.theme-blue #header,body.theme-blue #player,body.theme-blue #sidebar{backgro
   z-index: 400;
   background: rgba(0,0,0,0.9);
 }
+
+/* ============================================================
+   CSS وضع المصحف (Mushaf Mode)
+   ============================================================ */
+
+.mushaf-page {
+  background: #ffffff;
+  color: #1a1a1a;
+  padding: 15px 20px;
+  margin: 0 auto;
+  max-width: 750px;
+  border-radius: 8px;
+  position: relative;
+  min-height: 90vh;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  border: 3px solid #1a5490;
+}
+
+.mushaf-frame-top {
+  height: 40px;
+  background: linear-gradient(180deg, #f5e6c8 0%, #e8d4a0 50%, #f5e6c8 100%);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  position: relative;
+  border: 2px solid #1a5490;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mushaf-frame-top::before {
+  content: "❁ ❁ ❁ ❁ ❁ ❁ ❁ ❁ ❁";
+  color: #2ecc71;
+  font-size: 14px;
+  letter-spacing: 8px;
+  text-shadow: 1px 1px 0 #1a5490;
+}
+
+.mushaf-frame-bottom {
+  margin-top: 12px;
+  padding: 8px;
+  background: linear-gradient(180deg, #f5e6c8 0%, #e8d4a0 50%, #f5e6c8 100%);
+  border-radius: 4px;
+  text-align: center;
+  border: 2px solid #1a5490;
+  position: relative;
+}
+
+.mushaf-surah-footer {
+  color: #1a5490;
+  font-family: 'Amiri Quran', serif;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 4px 20px;
+  background: #f5e6c8;
+  border-radius: 20px;
+  border: 1px solid #2ecc71;
+  display: inline-block;
+}
+
+.mushaf-surah-header {
+  text-align: center;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(26, 84, 144, 0.1), rgba(46, 204, 113, 0.1));
+  border: 2px solid #1a5490;
+  border-radius: 12px;
+  color: #1a5490;
+  font-family: 'Amiri Quran', serif;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.mushaf-bismillah {
+  text-align: center;
+  font-family: 'Amiri Quran', serif;
+  font-size: 24px;
+  color: #1a5490;
+  padding: 12px 0;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed rgba(26, 84, 144, 0.3);
+}
+
+.mushaf-content {
+  font-family: 'Amiri Quran', serif;
+  font-size: 24px;
+  line-height: 2.4;
+  text-align: justify;
+  direction: rtl;
+  padding: 5px;
+}
+
+.mushaf-ayah {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  display: inline;
+}
+.mushaf-ayah:active {
+  background: rgba(255, 215, 0, 0.3);
+}
+.mushaf-ayah.active {
+  background: rgba(46, 204, 113, 0.25);
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+.mushaf-ayah.sajda {
+  background: rgba(76, 175, 80, 0.15);
+  border-right: 3px solid #4CAF50;
+  padding-right: 8px;
+}
+.mushaf-ayah.sajda::before {
+  content: "۩";
+  color: #4CAF50;
+  font-size: 20px;
+  margin-left: 4px;
+}
+
+.ayah-num {
+  display: inline-block;
+  min-width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1a1a;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0 6px;
+  vertical-align: middle;
+  font-family: 'Tajawal', sans-serif;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 2px solid #fff;
+}
+
+#mushafBottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(15, 32, 39, 0.98);
+  backdrop-filter: blur(10px);
+  border-top: 2px solid #FFD700;
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 95;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  color: #FFD700;
+  padding: 0 15px;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+#mushafBottomBar.hidden-bar {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#mushafBottomBar span {
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.1);
+  font-weight: 600;
+}
+
+.mushaf-nav-btn {
+  position: fixed;
+  bottom: 60px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF5500, #FFAA00);
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 85, 0, 0.5);
+  z-index: 96;
+  display: none;
+}
+.mushaf-nav-btn:active {
+  transform: scale(0.9);
+}
+.mushaf-nav-prev { left: 15px; }
+.mushaf-nav-next { right: 15px; }
+
+#mushafToggleBtn {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #FFD700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#mushafToggleBtn:active {
+  background: rgba(255, 215, 0, 0.3);
+}
+
+body.theme-night .mushaf-page,
+body.theme-dark .mushaf-page {
+  background: #f5f0e0;
+  color: #1a1a1a;
+}
+body.theme-light .mushaf-page,
+body.theme-sepia .mushaf-page {
+  background: #ffffff;
+}
+
+
+/* ============ صورة المصحف ============ */
+.mushaf-page-img {
+  padding: 0 !important;
+  background: #fff !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.mushaf-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#FFAA00">
@@ -205,6 +438,7 @@ body.theme-blue #header,body.theme-blue #player,body.theme-blue #sidebar{backgro
   <button id="menuBtn" onclick="toggleSidebar()">☰</button>
   <button id="readerBtn" onclick="openReaderPicker()"><span>🎙️</span><span class="reader-name">مشاري العفاسي</span></button>
   <button id="duaBtn" onclick="openKhatmDua()" style="background:transparent;border:none;color:#FFD700;font-size:20px;cursor:pointer;padding:8px;border-radius:8px">🤲</button>
+  <button id="mushafToggleBtn" onclick="toggleMushafMode()" title="تبديل وضع المصحف">📖</button>
   <button id="settingsBtn" onclick="openSettings()">⚙️</button>
 </div>
 
@@ -235,6 +469,7 @@ body.theme-blue #header,body.theme-blue #player,body.theme-blue #sidebar{backgro
 
 <!-- المشغل السفلي -->
 <div id="player" style="display:none">
+  <button id="collapsePlayerBtn" onclick="togglePlayerCollapse()" style="position:absolute;top:-30px;right:15px;background:#FF5500;color:#fff;border:none;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer">▼ إخفاء</button>
   <div class="controls">
     <button onclick="prevAyah()">⏮</button>
     <button id="playBtn" onclick="togglePlay()">▶</button>
@@ -264,7 +499,21 @@ body.theme-blue #header,body.theme-blue #player,body.theme-blue #sidebar{backgro
 <!-- بحث عام (مخفي) -->
 <input type="text" id="search" style="display:none">
 
+
+<!-- شريط المصحف السفلي -->
+<div id="mushafBottomBar">
+  <span id="bottomJuz">الجزء 1</span>
+  <span id="bottomPage">الصفحة 1</span>
+  <span id="bottomSurah">سورة الفاتحة</span>
+</div>
+
+<!-- أزرار التنقل في المصحف -->
+<button class="mushaf-nav-btn mushaf-nav-prev" onclick="prevPage()" id="mushafPrevBtn">‹</button>
+<button class="mushaf-nav-btn mushaf-nav-next" onclick="nextPage()" id="mushafNextBtn">›</button>
+
+<!-- السكريبتات -->
 <script src="parts.js"></script>
+<script src="mushaf.js"></script>
 <script src="prayer.js"></script>
 <script src="extras.js"></script>
 <script src="settings.js"></script>
