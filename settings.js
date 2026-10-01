@@ -10,7 +10,36 @@ function getSettings(){try{var saved=JSON.parse(localStorage.getItem("settings")
 
 function saveSetting(key,value){var s=getSettings();s[key]=value;localStorage.setItem("settings",JSON.stringify(s));applySettings();}
 
-function applySettings(){var s=getSettings();var ayahs=document.querySelectorAll(".ayah");for(var i=0;i<ayahs.length;i++){ayahs[i].style.fontFamily="'"+s.fontFamily+"', 'Amiri Quran', serif";ayahs[i].style.fontSize=s.fontSize+"px";}document.body.classList.remove("theme-dark","theme-night","theme-sepia","theme-light","theme-green","theme-blue");document.body.classList.add("theme-"+s.theme);var rn=document.querySelector(".reader-name");if(rn){for(var j=0;j<READERS.length;j++){if(READERS[j].id===s.reader){rn.textContent=READERS[j].name;break;}}}}
+function applySettings() {
+  var s = getSettings();
+  
+  // ✅ تطبيق على الآيات (وضع الآيات)
+  var ayahs = document.querySelectorAll(".ayah");
+  for (var i = 0; i < ayahs.length; i++) {
+    ayahs[i].style.fontFamily = "'" + s.fontFamily + "', 'Amiri Quran', serif";
+    ayahs[i].style.fontSize = s.fontSize + "px";
+  }
+  
+  // ✅ تطبيق على المصحف (وضع المصحف) — تكبير الصورة
+  if (typeof applyFontSizeToMushaf === "function") {
+    applyFontSizeToMushaf();
+  }
+  
+  // ✅ الثيمات
+  document.body.classList.remove("theme-dark", "theme-night", "theme-sepia", "theme-light", "theme-green", "theme-blue");
+  document.body.classList.add("theme-" + s.theme);
+  
+  // ✅ اسم القارئ
+  var rn = document.querySelector(".reader-name");
+  if (rn) {
+    for (var j = 0; j < READERS.length; j++) {
+      if (READERS[j].id === s.reader) {
+        rn.textContent = READERS[j].name;
+        break;
+      }
+    }
+  }
+}
 
 function openReaderPicker(){var s=getSettings();var html='<div class="picker-overlay" onclick="closePicker(event)"><div class="picker-content" onclick="event.stopPropagation()"><div class="picker-header"><h3>🎙️ اختر القارئ</h3><button class="picker-close" onclick="closePicker()">✕</button></div><div class="picker-list">';for(var i=0;i<READERS.length;i++){var r=READERS[i];var cls=r.id===s.reader?" active":"";html+='<button class="picker-item'+cls+'" onclick="selectReader(\''+r.id+'\')"><span class="picker-flag">'+r.flag+'</span><div class="picker-info"><div class="picker-name">'+r.name+'</div><div class="picker-country">'+r.country+'</div></div>'+(r.id===s.reader?'<span class="picker-check">✓</span>':'')+'</button>';}html+='</div></div></div>';document.body.insertAdjacentHTML("beforeend",html);}
 
@@ -22,7 +51,16 @@ function openSettings(){var s=getSettings();var readerName="";for(var i=0;i<READ
 
 function closeSettings(e){if(e&&e.target!==e.currentTarget&&!e.target.classList.contains("picker-close"))return;var el=document.querySelector(".picker-overlay");if(el)el.remove();}
 
-function changeFontSize(delta){var s=getSettings();var newSize=Math.max(16,Math.min(48,s.fontSize+delta));saveSetting("fontSize",newSize);var el=document.getElementById("fontSizeValue");if(el)el.textContent=newSize;}
+function changeFontSize(delta){
+  var s = getSettings();
+  var newSize = Math.max(16, Math.min(48, s.fontSize + delta));
+  saveSetting("fontSize", newSize);
+  var el = document.getElementById("fontSizeValue");
+  if (el) el.textContent = newSize;
+  
+  // ✅ أطلق حدث تغيير حجم الخط (لتكبير صورة المصحف)
+  window.dispatchEvent(new CustomEvent("fontSizeChanged", { detail: { size: newSize } }));
+}
 
 function openBookmarks(){var bms=[];try{bms=JSON.parse(localStorage.getItem("bookmarks")||"[]");}catch(e){}if(bms.length===0){alert("لا توجد إشارات مرجعية بعد.\nاضغط ضغطة طويلة على أي آية.");return;}var html='<div class="picker-overlay" onclick="closeBookmarks(event)"><div class="picker-content" onclick="event.stopPropagation()"><div class="picker-header"><h3>🔖 العلامات</h3><button class="picker-close" onclick="closeBookmarks()">✕</button></div><div class="picker-list">';for(var i=0;i<bms.length;i++){var b=bms[i];html+='<button class="picker-item" onclick="closeBookmarks();jumpToBookmark('+b.surah+','+b.ayah+')"><span class="picker-flag">🔖</span><div class="picker-info"><div class="picker-name">سورة '+b.surah+' — الآية '+b.ayah+'</div></div></button>';}html+='</div></div></div>';document.body.insertAdjacentHTML("beforeend",html);}
 

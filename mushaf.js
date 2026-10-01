@@ -40,16 +40,32 @@ async function displayPage(pageNum) {
   var juz = firstVerse.juz || 0;
   var surahName = getSurahNameFromKey(firstVerse.key);
 
-  var view = document.getElementById("mushafView");
-  if (!view) return;
+  // استخدام FlipBook إذا كان متاحاً
+  if (typeof createFlipBookFromImages === "function" && typeof St !== "undefined") {
+    var mushafView = document.getElementById("mushafView");
+    var flipContainer = document.getElementById("flipbookContainer");
+    if (mushafView) mushafView.style.display = "none";
+    if (flipContainer) flipContainer.style.display = "block";
 
-  var imgSrc = "pages-img/" + pageNum + ".jpg";
-  var html = '<div class="mushaf-page mushaf-page-img" data-page="' + pageNum + '">';
-  html += '<img src="' + imgSrc + '" class="mushaf-image" alt="صفحة ' + pageNum + '">';
-  html += '</div>';
-
-  view.innerHTML = html;
-  view.scrollTop = 0;
+    // أنشئ الكتاب إذا لم يكن موجوداً
+    if (!window.FLIPBOOK_INSTANCE) {
+      var images = [];
+      for (var p = 1; p <= 604; p++) images.push("pages-img/" + p + ".jpg");
+      createFlipBookFromImages(images);
+    }
+    
+    setTimeout(function() {
+      if (typeof flipBookGoTo === "function") flipBookGoTo(pageNum);
+    }, 300);
+  } else {
+    // fallback: عرض صورة واحدة
+    var view = document.getElementById("mushafView");
+    if (view) {
+      view.style.display = "block";
+      var imgSrc = "pages-img/" + pageNum + ".jpg";
+      view.innerHTML = '<div class="mushaf-page mushaf-page-img" data-page="' + pageNum + '"><img src="' + imgSrc + '" class="mushaf-image" alt="صفحة ' + pageNum + '"></div>';
+    }
+  }
 
   updateBottomBar(juz, pageNum, surahName);
   document.querySelectorAll(".surah-item").forEach(function (el) { el.classList.remove("active"); });
@@ -105,28 +121,95 @@ function toggleBottomBar() {
 }
 
 /* ============ 5. التنقل ============ */
-function nextPage() { if (CURRENT_PAGE < TOTAL_PAGES) displayPage(CURRENT_PAGE + 1); }
-function prevPage() { if (CURRENT_PAGE > 1) displayPage(CURRENT_PAGE - 1); }
+function nextPage() {
+  if (typeof window.FLIPBOOK_INSTANCE !== "undefined" && window.FLIPBOOK_INSTANCE) {
+    window.FLIPBOOK_INSTANCE.flipNext();
+  } else if (CURRENT_PAGE < TOTAL_PAGES) {
+    displayPage(CURRENT_PAGE + 1);
+  }
+}
+
+function prevPage() {
+  if (typeof window.FLIPBOOK_INSTANCE !== "undefined" && window.FLIPBOOK_INSTANCE) {
+    window.FLIPBOOK_INSTANCE.flipPrev();
+  } else if (CURRENT_PAGE > 1) {
+    displayPage(CURRENT_PAGE - 1);
+  }
+}
 function goToPage(pageNum) { displayPage(pageNum); }
 
 /* ============ 6. تبديل الوضع ============ */
+/* ✅ متغير لمنع النقر السريع */
+var _mushafToggleLocked = false;
+var _mushafToggleTimer = null;
+
 function toggleMushafMode() {
+  // ✅ امنع النقرات السريعة خلال 400ms
+  if (_mushafToggleLocked) {
+    console.log("⚠️ الزر مقفل — تجاهل النقرة");
+    return;
+  }
+  _mushafToggleLocked = true;
+  if (_mushafToggleTimer) clearTimeout(_mushafToggleTimer);
+  _mushafToggleTimer = setTimeout(function () {
+    _mushafToggleLocked = false;
+  }, 400);
+
+  // ✅ اقلب الحالة
   MUSHAF_MODE = !MUSHAF_MODE;
+  console.log("🔄 وضع المصحف:", MUSHAF_MODE);
+
+  // ✅ احصل على العناصر
   var btn = document.getElementById("mushafToggleBtn");
   var bar = document.getElementById("mushafBottomBar");
   var player = document.getElementById("player");
+  var collapseBtn = document.getElementById("collapsePlayerBtn");
+  var flipContainer = document.getElementById("flipbookContainer");
+  var mushafView = document.getElementById("mushafView");
 
   if (MUSHAF_MODE) {
+    // ===== وضع المصحف =====
     if (btn) btn.textContent = "📖";
-    if (bar) bar.style.display = "flex";
-    if (player) player.style.display = "flex";
-    console.log("📖 وضع المصحف");
-    if (!document.querySelector(".mushaf-page-img")) displayPage(1);
+    if (bar) bar.style.display = "none";
+    if (player) player.style.display = "none";
+    if (collapseBtn) collapseBtn.style.display = "none";
+
+    // ✅ أخفِ mushafView، أظهر flipbook
+    if (mushafView) mushafView.style.display = "none";
+    if (flipContainer) flipContainer.style.display = "block";
+
+    // ✅ أعد إنشاء الكتاب إذا لم يكن موجوداً
+    if (!window.FLIPBOOK_INSTANCE) {
+      // جهّز قائمة الصور
+      var images = [];
+      for (var p = 1; p <= 604; p++) {
+        images.push("pages-img/" + p + ".jpg");
+      }
+
+      if (typeof createFlipBookFromImages === "function") {
+        createFlipBookFromImages(images);
+      }
+    } else {
+      // ✅ إذا كان موجوداً، فقط تحديث الحجم
+      if (typeof window.FLIPBOOK_INSTANCE.update === "function") {
+        try { window.FLIPBOOK_INSTANCE.update(); } catch (e) {}
+      }
+    }
   } else {
+    // ===== وضع الآيات =====
     if (btn) btn.textContent = "📄";
     if (bar) bar.style.display = "none";
-    console.log("📄 وضع الآيات");
-    if (typeof currentSurah !== "undefined" && currentSurah) loadSurah(currentSurah);
+    if (player) player.style.display = "flex";
+    if (collapseBtn) collapseBtn.style.display = "block";
+
+    // ✅ أخفِ flipbook، أظهر mushafView
+    if (flipContainer) flipContainer.style.display = "none";
+    if (mushafView) mushafView.style.display = "block";
+
+    // ✅ أعد عرض السورة
+    if (typeof currentSurah !== "undefined" && currentSurah) {
+      loadSurah(currentSurah);
+    }
   }
 }
 

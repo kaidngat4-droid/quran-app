@@ -409,11 +409,176 @@ body.theme-sepia .mushaf-page {
   -webkit-user-drag: none;
 }
 
+
+/* ============================================================
+   تأثير تقليب الورق (Page Curl)
+   ============================================================ */
+
+#mushafView {
+  perspective: 2000px;
+  perspective-origin: center;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-y;
+}
+
+.mushaf-page-img {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1),
+              box-shadow 0.5s ease,
+              filter 0.5s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-origin: right center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.mushaf-page-img.flipping-left {
+  transform: rotateY(-180deg) scale(0.95);
+  box-shadow: 20px 0 40px rgba(0,0,0,0.5);
+  filter: brightness(0.9);
+}
+
+.mushaf-page-img.flipping-right {
+  transform: rotateY(180deg) scale(0.95);
+  box-shadow: -20px 0 40px rgba(0,0,0,0.5);
+  filter: brightness(0.9);
+}
+
+/* تأثير أثناء السحب */
+.mushaf-page-img.dragging {
+  transition: none;
+  box-shadow: 15px 0 40px rgba(0,0,0,0.5);
+}
+
+/* طبقة الظل الديناميكي */
+.page-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.page-shadow.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.4), transparent);
+}
+
+.page-shadow.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.4), transparent);
+}
+
+.page-shadow.visible {
+  opacity: 1;
+}
+
+/* مؤشر التقليب */
+.flip-indicator {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #FFD700;
+  font-size: 40px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 100;
+  pointer-events: none;
+  text-shadow: 0 0 20px rgba(255,215,0,0.8);
+}
+
+.flip-indicator.left { left: 20px; }
+.flip-indicator.right { right: 20px; }
+
+.flip-indicator.visible {
+  opacity: 1;
+}
+
+/* تأثير نبضة أثناء التقليب */
+@keyframes flipPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+
+/* ============ FlipBook 3D ============ */
+#flipbookContainer {
+  width: 100%;
+  height: calc(100vh - 130px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  position: relative;
+}
+
+.stf__parent {
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.stf__wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.stf__item {
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.page {
+  background: #0a0a0a;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #0a0a0a;
+  margin: 0 auto;
+  transition: transform 0.2s ease;
+  touch-action: pinch-zoom;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.stf__controls {
+  display: none !important;
+}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#FFAA00">
 <link rel="icon" type="image/png" href="images/icon-192.png">
 <link rel="apple-touch-icon" href="images/icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.css">
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 </head>
 <body>
 
@@ -464,7 +629,8 @@ body.theme-sepia .mushaf-page {
 
 <!-- منطقة المصحف -->
 <div id="mushaf" style="display:none">
-  <div id="mushafView"><h2 style="text-align:center;color:#FFD700;padding:40px">اختر سورة من القائمة ☰</h2></div>
+  <div id="flipbookContainer" style="display:none;width:100%;height:calc(100vh - 200px);"></div>
+<div id="mushafView"><h2 style="text-align:center;color:#FFD700;padding:40px">اختر سورة من القائمة ☰</h2></div>
 </div>
 
 <!-- المشغل السفلي -->
@@ -513,6 +679,8 @@ body.theme-sepia .mushaf-page {
 
 <!-- السكريبتات -->
 <script src="parts.js"></script>
+<script src="flipbook.js"></script>
+<script src="zoom.js"></script>
 <script src="mushaf.js"></script>
 <script src="prayer.js"></script>
 <script src="extras.js"></script>

@@ -1,56 +1,44 @@
 #!/usr/bin/env python3
-"""
-جلب صور مصحف المدينة النبوية (kfgqpc/hafs-wasat)
-من مستودع QuranHub/quran-pages-images
-"""
+"""جلب صور مصحف التجويد من QuranHub"""
 import os
 import subprocess
 import sys
 
-TARGET_DIR = "pages-img"
-REPO_URL = "https://github.com/QuranHub/quran-pages-images.git"
+TARGET = "pages-img"
+REPO = "https://github.com/QuranHub/quran-pages-images.git"
 
-print("📥 جاري جلب صور مصحف المدينة...")
+print("📥 جلب صور مصحف التجويد...")
 print("=" * 50)
 
-# 1. تحقق إذا كانت الصور موجودة
-if os.path.exists(TARGET_DIR) and len(os.listdir(TARGET_DIR)) >= 600:
-    print(f"✅ الصور موجودة ({len(os.listdir(TARGET_DIR))} صورة)")
+if os.path.exists(TARGET) and len([f for f in os.listdir(TARGET) if f.endswith('.jpg')]) >= 600:
+    print("✅ الصور موجودة")
     sys.exit(0)
 
-# 2. استنسخ المستودع مؤقتاً
-print("⏳ استنساخ المستودع (قد يستغرق 2-5 دقائق)...")
 if os.path.exists("temp-pages"):
     subprocess.run(["rm", "-rf", "temp-pages"])
 
 try:
-    subprocess.run(
-        ["git", "clone", "--depth", "1", REPO_URL, "temp-pages"],
-        check=True,
-        capture_output=True
-    )
+    subprocess.run(["git", "clone", "--depth", "1", REPO, "temp-pages"], check=True)
     print("✅ تم الاستنساخ")
 except subprocess.CalledProcessError as e:
-    print(f"❌ فشل الاستنساخ: {e}")
+    print(f"❌ فشل: {e}")
     sys.exit(1)
 
-# 3. انسخ الصور
-os.makedirs(TARGET_DIR, exist_ok=True)
-src = "temp-pages/kfgqpc/hafs-wasat"
+os.makedirs(TARGET, exist_ok=True)
+src = "temp-pages/easyquran.com/hafs-tajweed"
 
 if not os.path.exists(src):
-    print(f"❌ لم يُعثر على المجلد: {src}")
+    print(f"❌ غير موجود: {src}")
     sys.exit(1)
 
-print("📋 جاري النسخ...")
-files = [f for f in os.listdir(src) if f.endswith((".jpg", ".png", ".jpeg"))]
+files = [f for f in os.listdir(src) if f.endswith('.jpg')]
+print(f"📋 نسخ {len(files)} صورة...")
+
 for i, f in enumerate(files):
-    subprocess.run(["cp", os.path.join(src, f), TARGET_DIR + "/"])
+    subprocess.run(["cp", os.path.join(src, f), TARGET + "/"])
     if (i + 1) % 100 == 0:
         print(f"✅ {i+1}/{len(files)}")
 
-# 4. احذف المؤقت
 subprocess.run(["rm", "-rf", "temp-pages"])
-
 print("=" * 50)
-print(f"✅ تم نسخ {len(files)} صورة إلى {TARGET_DIR}/")
+print(f"✅ {len(files)} صورة في {TARGET}/")
