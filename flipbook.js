@@ -13,7 +13,7 @@ function createFlipBookFromImages(images) {
     
     container = document.createElement("div");
     container.id = "flipbookContainer";
-    container.style.cssText = "width:100%;height:calc(100vh - 180px);display:none;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
+    container.style.cssText = "width:100%;height:calc(100vh - 180px);display:block;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
     
     if (mushafView && mushafView.parentNode) {
       mushafView.parentNode.insertBefore(container, mushafView);
@@ -41,7 +41,7 @@ function createFlipBookFromImages(images) {
     if (!container) {
       container = document.createElement("div");
       container.id = "flipbookContainer";
-      container.style.cssText = "width:100%;height:calc(100vh - 180px);display:none;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
+      container.style.cssText = "width:100%;height:calc(100vh - 180px);display:block;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
       
       var mv = document.getElementById("mushafView");
       if (mv && mv.parentNode) {

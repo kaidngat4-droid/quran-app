@@ -175,8 +175,8 @@ function toggleMushafMode() {
     if (collapseBtn) collapseBtn.style.display = "none";
 
     // ✅ أخفِ mushafView، أظهر flipbook
-    if (mushafView) mushafView.style.display = "none";
-    if (flipContainer) flipContainer.style.display = "block";
+    if (mushafView) mushafView.style.setProperty("display", "none", "important");
+    if (flipContainer) flipContainer.style.setProperty("display", "block", "important");
 
     // ✅ أعد إنشاء الكتاب إذا لم يكن موجوداً
     if (!window.FLIPBOOK_INSTANCE) {
@@ -203,8 +203,12 @@ function toggleMushafMode() {
     if (collapseBtn) collapseBtn.style.display = "block";
 
     // ✅ أخفِ flipbook، أظهر mushafView
-    if (flipContainer) flipContainer.style.display = "none";
-    if (mushafView) mushafView.style.display = "block";
+    if (flipContainer) flipContainer.style.setProperty("display", "none", "important");
+    if (mushafView) mushafView.style.setProperty("display", "block", "important");
+    if (typeof window.FLIPBOOK_INSTANCE !== "undefined" && window.FLIPBOOK_INSTANCE) {
+      try { window.FLIPBOOK_INSTANCE.destroy(); } catch (e) {}
+      window.FLIPBOOK_INSTANCE = null;
+    }
 
     // ✅ أعد عرض السورة
     if (typeof currentSurah !== "undefined" && currentSurah) {
