@@ -146,6 +146,7 @@ function flipBookPrev() {
 function onFlipBookChange(e) {
   var pageIndex = e.data + 1;
   if (typeof CURRENT_PAGE !== "undefined") CURRENT_PAGE = pageIndex;
+  if (typeof refreshNearbyPages === "function") refreshNearbyPages(pageIndex);
   if (typeof updateBottomBar === "function" && typeof PAGES_DATA !== "undefined" && PAGES_DATA) {
     var pageData = PAGES_DATA[String(pageIndex)];
     if (pageData && pageData.length > 0) {

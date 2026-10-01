@@ -9,6 +9,22 @@ var MUSHAF_MODE = false;
 var _playerCollapsed = false;
 var _bottomBarTimer = null;
 
+
+/* قائمة صور كسولة: الصفحات البعيدة تبقى فارغة حتى نقترب منها */
+var BLANK_IMG = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
+function buildImageList(centerPage) {
+  var list = [];
+  for (var p = 1; p <= 604; p++) {
+    list.push(Math.abs(p - centerPage) <= 6 ? "pages-img/" + p + ".jpg" : BLANK_IMG);
+  }
+  return list;
+}
+function refreshNearbyPages(page) {
+  var fb = window.FLIPBOOK_INSTANCE;
+  if (!fb || typeof fb.updateFromImages !== "function") return;
+  try { fb.updateFromImages(buildImageList(page)); } catch (e) {}
+}
+
 /* ============ 1. تحميل البيانات ============ */
 async function loadPagesData() {
   if (PAGES_DATA) return PAGES_DATA;
@@ -49,9 +65,7 @@ async function displayPage(pageNum) {
 
     // أنشئ الكتاب إذا لم يكن موجوداً
     if (!window.FLIPBOOK_INSTANCE) {
-      var images = [];
-      for (var p = 1; p <= 604; p++) images.push("pages-img/" + p + ".jpg");
-      createFlipBookFromImages(images);
+      createFlipBookFromImages(buildImageList(pageNum));
     }
     
     setTimeout(function() {
@@ -181,10 +195,7 @@ function toggleMushafMode() {
     // ✅ أعد إنشاء الكتاب إذا لم يكن موجوداً
     if (!window.FLIPBOOK_INSTANCE) {
       // جهّز قائمة الصور
-      var images = [];
-      for (var p = 1; p <= 604; p++) {
-        images.push("pages-img/" + p + ".jpg");
-      }
+      var images = buildImageList(CURRENT_PAGE || 1);
 
       if (typeof createFlipBookFromImages === "function") {
         createFlipBookFromImages(images);
