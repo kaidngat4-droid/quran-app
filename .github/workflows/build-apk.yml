@@ -63,6 +63,8 @@ jobs:
           cp parts.js www/
           cp prayer.js www/
           cp mushaf.js www/
+          cp flipbook.js www/
+          cp zoom.js www/
           cp page-flip.browser.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true

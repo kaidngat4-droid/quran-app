@@ -12,7 +12,6 @@ ios/
 Thumbs.db
 
 # Mushaf images (كبيرة — تُجلب في CI)
-pages-img/
 
 # Built files (تُبنى في CI)
 www/
