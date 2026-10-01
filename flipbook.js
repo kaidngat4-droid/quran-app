@@ -3,12 +3,58 @@ window.FLIPBOOK_INSTANCE = null;
 
 function createFlipBookFromImages(images) {
   var container = document.getElementById("flipbookContainer");
-  if (!container) return null;
+  
+  // ✅ إذا الحاوية غير موجودة (بعد destroy)، أنشئها
+  if (!container) {
+    console.log("⚠️ flipbookContainer غير موجود — إنشاء جديد");
+    
+    // ابحث عن mushafView كمرجع
+    var mushafView = document.getElementById("mushafView");
+    
+    container = document.createElement("div");
+    container.id = "flipbookContainer";
+    container.style.cssText = "width:100%;height:calc(100vh - 180px);display:none;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
+    
+    if (mushafView && mushafView.parentNode) {
+      mushafView.parentNode.insertBefore(container, mushafView);
+      console.log("✅ تم إنشاء flipbookContainer قبل mushafView");
+    } else {
+      document.body.appendChild(container);
+      console.log("✅ تم إنشاء flipbookContainer في body");
+    }
+    
+    // أعد الحصول عليه
+    container = document.getElementById("flipbookContainer");
+  }
+  
+  if (!container) {
+    console.error("❌ لا يمكن إنشاء flipbookContainer");
+    return null;
+  }
+  
   if (window.FLIPBOOK_INSTANCE) {
     try { window.FLIPBOOK_INSTANCE.destroy(); } catch (e) {}
     window.FLIPBOOK_INSTANCE = null;
+    
+    // ✅ بعد destroy، تحقق مرة أخرى
+    container = document.getElementById("flipbookContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "flipbookContainer";
+      container.style.cssText = "width:100%;height:calc(100vh - 180px);display:none;align-items:center;justify-content:center;background:#0f2027;padding:5px;box-sizing:border-box;overflow:hidden;";
+      
+      var mv = document.getElementById("mushafView");
+      if (mv && mv.parentNode) {
+        mv.parentNode.insertBefore(container, mv);
+      } else {
+        document.body.appendChild(container);
+      }
+      container = document.getElementById("flipbookContainer");
+    }
   }
+  
   container.innerHTML = "";
+  
   if (typeof St === "undefined" || typeof St.PageFlip === "undefined") return null;
 
   var screenW = window.innerWidth;
