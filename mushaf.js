@@ -15,7 +15,7 @@ var BLANK_IMG = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAA
 function buildImageList(centerPage) {
   var list = [];
   for (var p = 1; p <= 604; p++) {
-    list.push(Math.abs(p - centerPage) <= 6 ? "pages-img/" + p + ".jpg" : BLANK_IMG);
+    list.push("pages-img/" + p + ".jpg");
   }
   return list;
 }
@@ -419,3 +419,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 console.log("✅ mushaf.js جاهز");
+
+var _preloaded = {};
+function preloadNearby(page) {
+  for (var p = Math.max(1, page - 3); p <= Math.min(604, page + 5); p++) {
+    if (_preloaded[p]) continue;
+    _preloaded[p] = true;
+    var im = new Image();
+    im.src = "pages-img/" + p + ".jpg";
+  }
+}
