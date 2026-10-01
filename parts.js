@@ -268,10 +268,4 @@ function closeJuzNotification(e) {
   if (el) el.remove();
 }
 
-function checkJuzCompletion(surahNum, ayahNum) {
-  var juz = getJuzForSurahAyah(surahNum, ayahNum);
-  if (!juz) return;
-  if (isLastAyahOfJuz(surahNum, ayahNum, juz.juz)) {
-    showJuzCompleteNotification(juz.juz);
-  }
-}
+/* checkJuzCompletion انتقلت إلى juz-complete.js */
