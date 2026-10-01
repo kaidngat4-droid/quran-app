@@ -94,3 +94,19 @@ jobs:
           name: quran-app-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: warn
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "قرآن v1.0.${{ github.run_number }}"
+          body: |
+            ## 📖 القرآن الكريم
+            - الإصدار: v1.0.${{ github.run_number }}
+            - التاريخ: ${{ github.event.head_commit.timestamp }}
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
