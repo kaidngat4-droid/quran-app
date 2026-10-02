@@ -60,6 +60,7 @@ jobs:
           cp sw.js www/
           cp settings.js www/
           cp extras.js www/
+          cp adhkar.js www/
           cp parts.js www/
           cp prayer.js www/
           cp mushaf.js www/
