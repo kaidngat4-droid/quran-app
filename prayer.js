@@ -1,38 +1,34 @@
+/* تحويل "HH:MM" (24 ساعة) إلى 12 ساعة مع ص/م */
+function to12h(t) {
+  if (!t) return "";
+  var m = String(t).match(/(\d{1,2}):(\d{2})/);
+  if (!m) return t;
+  var h = parseInt(m[1], 10), min = m[2];
+  var suffix = h >= 12 ? "م" : "ص";
+  h = h % 12;
+  if (h === 0) h = 12;
+  return h + ":" + min + " " + suffix;
+}
+
 /* prayer.js — مواقيت الصلاة والقبلة والتنبيهات */
 
+var SANAA = { lat: 15.3694, lon: 44.1910 };
+var SANAA_TZ = "Asia/Aden";
+
 async function getCurrentLocation() {
-  try {
-    if (typeof Capacitor === "undefined" || !Capacitor.Plugins.Geolocation) {
-      // fallback: استخدام موقع افتراضي (اليمن - صنعاء)
-      console.warn("Capacitor Geolocation غير متوفر، استخدام موقع افتراضي");
-      return { lat: 15.3694, lon: 44.1910 };
-    }
-    var perm = await Capacitor.Plugins.Geolocation.checkPermissions();
-    if (perm.location !== "granted") {
-      perm = await Capacitor.Plugins.Geolocation.requestPermissions();
-    }
-    if (perm.location !== "granted") {
-      alert("⚠️ نحتاج إذن الموقع لحساب مواقيت الصلاة");
-      return { lat: 15.3694, lon: 44.1910 };
-    }
-    var pos = await Capacitor.Plugins.Geolocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 15000
-    });
-    return { lat: pos.coords.latitude, lon: pos.coords.longitude };
-  } catch (e) {
-    console.error("خطأ الموقع:", e);
-    return { lat: 15.3694, lon: 44.1910 };
-  }
+  return SANAA;
+}
+
+/* تاريخ اليوم بتوقيت صنعاء (dd-mm-yyyy) */
+function sanaaDateStr() {
+  var p = new Intl.DateTimeFormat("en-GB", { timeZone: SANAA_TZ, day: "2-digit", month: "2-digit", year: "numeric" }).formatToParts(new Date());
+  var o = {};
+  p.forEach(function (x) { o[x.type] = x.value; });
+  return o.day + "-" + o.month + "-" + o.year;
 }
 
 async function fetchPrayerTimes(lat, lon) {
-  var today = new Date();
-  var d = String(today.getDate()).padStart(2, "0");
-  var m = String(today.getMonth() + 1).padStart(2, "0");
-  var y = today.getFullYear();
-  var dateStr = d + "-" + m + "-" + y;
-  var url = "https://api.aladhan.com/v1/timings/" + dateStr + "?latitude=" + lat + "&longitude=" + lon + "&method=3";
+  var url = "https://api.aladhan.com/v1/timings/" + sanaaDateStr() + "?latitude=" + lat + "&longitude=" + lon + "&method=4&timezonestring=" + SANAA_TZ;
   var res = await fetch(url);
   var data = await res.json();
   return data.data;
@@ -74,7 +70,7 @@ async function openPrayerTimes() {
       h += '<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center">';
       h += '<div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">' + p.icon + '</span>';
       h += '<span style="color:#fff;font-size:16px;font-weight:600">' + p.name + '</span></div>';
-      h += '<span style="color:#FFD700;font-size:18px;font-weight:700">' + p.time + '</span>';
+      h += '<span style="color:#FFD700;font-size:18px;font-weight:700">' + to12h(p.time) + '</span>';
       h += '</div>';
     }
     h += '<button class="setting-btn" onclick="openQibla(' + loc.lat + ',' + loc.lon + ')" style="margin-top:15px">🧭 اتجاه القبلة</button>';
@@ -130,3 +126,99 @@ function closeQibla(e) {
   var el = document.querySelector(".picker-overlay");
   if (el) el.remove();
 }
+
+/* ============ التنبيه التلقائي للصلاة ============ */
+let autoPrayerInterval = null;
+let lastNotifiedPrayer = "";
+
+function toggleAutoPrayer() {
+    const toast = document.getElementById("prayerToast");
+    
+    if (autoPrayerInterval) {
+        // إيقاف التنبيه
+        clearInterval(autoPrayerInterval);
+        autoPrayerInterval = null;
+        if (toast) {
+            toast.textContent = "🔕 تم إيقاف التنبيه التلقائي للصلاة";
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 2000);
+        }
+        console.log("🔕 Auto prayer disabled");
+    } else {
+        // تشغيل التنبيه
+        autoPrayerInterval = setInterval(checkPrayerTime, 60000); // كل دقيقة
+        if (toast) {
+            toast.textContent = "🔔 تم تفعيل التنبيه التلقائي للصلاة";
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 2000);
+        }
+        console.log("🔔 Auto prayer enabled");
+        checkPrayerTime(); // فحص فوري
+    }
+}
+
+function checkPrayerTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const currentTime = hours + ":" + minutes;
+
+    // البحث عن أوقات الصلاة في DOM
+    const prayerElements = document.querySelectorAll("[data-prayer-time]");
+    prayerElements.forEach(el => {
+        const prayerName = el.getAttribute("data-prayer-name") || "الصلاة";
+        const prayerTime = el.textContent.trim();
+        
+        if (prayerTime === currentTime && lastNotifiedPrayer !== prayerName + currentTime) {
+            lastNotifiedPrayer = prayerName + currentTime;
+            showPrayerNotification(prayerName);
+        }
+    });
+}
+
+function showPrayerNotification(prayerName) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("🕌 حان وقت الصلاة", { 
+            body: "حان الآن وقت صلاة " + prayerName,
+            icon: "images/icon-192.png"
+        });
+    } else {
+        const toast = document.getElementById("prayerToast");
+        if (toast) {
+            toast.textContent = "🕌 حان وقت صلاة " + prayerName;
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 8000);
+        }
+    }
+}
+
+// طلب إذن الإشعارات
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+}
+
+/* ============ ربط زر المواقيت بالضغط العادي والطويل ============ */
+function _initPrayerBtn() {
+    var btn = document.getElementById("prayerTimesBtn");
+    if (!btn) return;
+    var timer = null, long = false;
+    function start() {
+        long = false;
+        timer = setTimeout(function () { long = true; toggleAutoPrayer(); }, 800);
+    }
+    function cancel() { clearTimeout(timer); }
+    btn.addEventListener("touchstart", start, { passive: true });
+    btn.addEventListener("mousedown", start);
+    ["touchend", "touchmove", "touchcancel", "mouseup", "mouseleave"].forEach(function (ev) {
+        btn.addEventListener(ev, cancel);
+    });
+    btn.addEventListener("click", function () {
+        if (long) { long = false; return; }
+        if (typeof closeSidebar === "function") closeSidebar();
+        setTimeout(function () {
+            try { openPrayerTimes(); } catch (e) { alert("خطأ في المواقيت: " + e.message); }
+        }, 200);
+    });
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", _initPrayerBtn);
+else _initPrayerBtn();
