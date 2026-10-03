@@ -131,31 +131,8 @@ function closeQibla(e) {
 let autoPrayerInterval = null;
 let lastNotifiedPrayer = "";
 
-function toggleAutoPrayer() {
-    const toast = document.getElementById("prayerToast");
-    
-    if (autoPrayerInterval) {
-        // إيقاف التنبيه
-        clearInterval(autoPrayerInterval);
-        autoPrayerInterval = null;
-        if (toast) {
-            toast.textContent = "🔕 تم إيقاف التنبيه التلقائي للصلاة";
-            toast.style.display = "block";
-            setTimeout(() => toast.style.display = "none", 2000);
-        }
-        console.log("🔕 Auto prayer disabled");
-    } else {
-        // تشغيل التنبيه
-        autoPrayerInterval = setInterval(checkPrayerTime, 60000); // كل دقيقة
-        if (toast) {
-            toast.textContent = "🔔 تم تفعيل التنبيه التلقائي للصلاة";
-            toast.style.display = "block";
-            setTimeout(() => toast.style.display = "none", 2000);
-        }
-        console.log("🔔 Auto prayer enabled");
-        checkPrayerTime(); // فحص فوري
-    }
-}
+/* toggleAutoPrayer انتقلت إلى adhan-auto.js */
+
 
 /* checkPrayerTime انتقلت إلى adhan-auto.js */
 
