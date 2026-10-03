@@ -2,7 +2,6 @@
 var _todayTimings = null, _todayKey = "";
 var _adhanAudio = null, _adhanUnlocked = false;
 var _nextAdhanTimer = null;
-var lastNotifiedPrayer = "";
 
 function _preloadAdhan() {
   if (_adhanAudio) return;
