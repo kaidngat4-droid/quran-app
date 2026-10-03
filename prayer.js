@@ -157,24 +157,7 @@ function toggleAutoPrayer() {
     }
 }
 
-function checkPrayerTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const currentTime = hours + ":" + minutes;
-
-    // البحث عن أوقات الصلاة في DOM
-    const prayerElements = document.querySelectorAll("[data-prayer-time]");
-    prayerElements.forEach(el => {
-        const prayerName = el.getAttribute("data-prayer-name") || "الصلاة";
-        const prayerTime = el.textContent.trim();
-        
-        if (prayerTime === currentTime && lastNotifiedPrayer !== prayerName + currentTime) {
-            lastNotifiedPrayer = prayerName + currentTime;
-            showPrayerNotification(prayerName);
-        }
-    });
-}
+/* checkPrayerTime انتقلت إلى adhan-auto.js */
 
 function showPrayerNotification(prayerName) {
     if ("Notification" in window && Notification.permission === "granted") {
