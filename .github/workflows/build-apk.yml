@@ -67,6 +67,9 @@ jobs:
           cp flipbook.js www/
           cp zoom.js www/
           cp juz-complete.js www/
+          cp adhan-auto.js www/
+          cp adhan-native.js www/
+          cp adhan*.mp3 www/ 2>/dev/null || true
           cp page-flip.browser.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
@@ -79,6 +82,7 @@ jobs:
           rm -rf android
           npx cap add android
           npx cap sync android
+          bash patch-android.sh
 
       - name: Generate Icons and Splash
         run: |
