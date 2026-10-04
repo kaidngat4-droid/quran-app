@@ -69,6 +69,7 @@ jobs:
           cp juz-complete.js www/
           cp adhan-auto.js www/
           cp adhan-native.js www/
+          cp qibla.js www/
           cp asma-data.js www/
           cp asma.js www/
           cp adhan*.mp3 www/ 2>/dev/null || true

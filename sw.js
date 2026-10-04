@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v38';
+const CACHE_NAME = 'quran-app-v40';
 const IMG_CACHE = 'quran-img-v1';
 const IMG_LIMIT = 700;
 
