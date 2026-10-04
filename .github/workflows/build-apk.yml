@@ -69,6 +69,8 @@ jobs:
           cp juz-complete.js www/
           cp adhan-auto.js www/
           cp adhan-native.js www/
+          cp asma-data.js www/
+          cp asma.js www/
           cp adhan*.mp3 www/ 2>/dev/null || true
           cp page-flip.browser.js www/
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
