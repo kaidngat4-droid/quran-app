@@ -22,12 +22,21 @@ const READER_SOURCES = {
   "ar.ahmedajamy":         { source: "everyayah", id: "Ahmed_ibn_Ali_al-Ajamy_128kbps" },
   "ar.hanirifai":          { source: "everyayah", id: "Hani_Rifai_192kbps" },
   "ar.muhammadayyoub":     { source: "everyayah", id: "Muhammad_Ayyoub_128kbps" },
-  "ar.aymanswoaid":        { source: "everyayah", id: "Ayman_Sowaid_64kbps" }
+  "ar.aymanswoaid":        { source: "everyayah", id: "Ayman_Sowaid_64kbps" },
+  "ar.muhammadhusaynamer": { source: "surah", id: "mohammad-hosyn-3amer-quran-96kb-114-sorah" }
 };
+
+function isSurahReader(readerId) {
+  var i = READER_SOURCES[readerId];
+  return !!(i && i.source === "surah");
+}
 
 function buildAudioURL(readerId, surahNum, ayahNum, globalAyahNum) {
   var info = READER_SOURCES[readerId] || READER_SOURCES["ar.alafasy"];
   var padded = String(surahNum).padStart(3, "0") + String(ayahNum).padStart(3, "0");
+  if (info.source === "surah") {
+    return "https://archive.org/download/" + info.id + "/" + String(surahNum).padStart(3, "0") + ".mp3";
+  }
   if (info.source === "everyayah") {
     return "https://everyayah.com/data/" + info.id + "/" + padded + ".mp3";
   }
@@ -317,7 +326,14 @@ function playAyah() {
   const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
   const url = buildAudioURL(reader, currentSurah, ayahNum, globalAyahNum);
 
-  if (window.OfflineAudio) {
+  if (isSurahReader(reader)) {
+    if (audio.src === url && !audio.ended) {
+      audio.play().catch(e => console.warn("خطأ الصوت:", e));
+    } else {
+      audio.src = url;
+      audio.play().catch(e => console.warn("خطأ الصوت:", e));
+    }
+  } else if (window.OfflineAudio) {
     OfflineAudio.setSource(audio, url, reader, currentSurah, ayahNum).then(function (ok) {
       if (ok) audio.play().catch(e => console.warn("خطأ الصوت:", e));
     });
@@ -368,7 +384,11 @@ function scrollToAyah(index) {
 
 audio.onplay = () => { if (playBtn) playBtn.textContent = "⏸"; };
 audio.onpause = () => { if (playBtn) playBtn.textContent = "▶"; };
-audio.onended = () => nextAyah();
+audio.onended = () => {
+  var r = (typeof getSettings === "function" ? getSettings().reader : "");
+  if (isSurahReader(r)) { isPlaying = false; if (playBtn) playBtn.textContent = "▶"; return; }
+  nextAyah();
+};
 audio.ontimeupdate = () => {
   if (audio.duration && progress) progress.value = (audio.currentTime / audio.duration) * 100;
   if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
