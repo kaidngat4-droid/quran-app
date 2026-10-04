@@ -8,9 +8,11 @@
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.1.2",
     "@capacitor/core": "^7.0.0",
     "@capacitor/geolocation": "^7.1.8",
     "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/preferences": "^7.0.4",
     "@capacitor/splash-screen": "^7.0.5",
     "react-pageflip": "^2.0.3"
   },

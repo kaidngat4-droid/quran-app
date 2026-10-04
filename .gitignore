@@ -35,3 +35,7 @@ temp-pages/
 
 # Images (temp)
 test-*.png
+
+# نسخ احتياطية
+*.bak
+*.bak-*

@@ -571,12 +571,76 @@ body.theme-sepia .mushaf-page {
 .stf__controls {
   display: none !important;
 }
+
+    /* ===== حجم خط الآيات ===== */
+    :root { --ayah-size: 24px; }
+    .ayah { font-size: var(--ayah-size, 24px); line-height: 1.9; transition: font-size 0.15s ease; }
+    #mushafView { touch-action: pan-y; }
+    #fontControls {
+        position: fixed;
+        bottom: 100px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 9999;
+        pointer-events: auto;
+    }
+    .font-ctrl-btn {
+        background: rgba(200,149,42,0.9);
+        border: 2px solid #FFD700;
+        color: #fff;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        -webkit-tap-highlight-color: transparent;
+    }
+    .font-ctrl-btn:active { background: rgba(200,149,42,0.4); transform: scale(1.1); }
+    
+    /* ===== تحسين عرض المصحف — ملء الشاشة الكامل ===== */
+    #flipbookContainer {
+        position: fixed !important;
+        top: 60px !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: calc(100vh - 60px) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        background: #0f2027 !important;
+        z-index: 100 !important;
+        touch-action: none !important;
+    }
+    
+    /* كل صفحة داخل الـ flipbook */
+    
+    
+    /* إزالة أي هوامش داخلية */
+    
+    
+    
+    
+    :root { --paper: #fff; }
+    #flipbookContainer { background: var(--paper) !important; }
+    #flipbookContainer .stf__parent, #flipbookContainer .stf__block { background: transparent !important; }
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#FFAA00">
 <link rel="icon" type="image/png" href="images/icon-192.png">
 <link rel="apple-touch-icon" href="images/icon-192.png">
-<script src="page-flip.browser.js"></script>
 </head>
 <body>
 
@@ -632,7 +696,14 @@ body.theme-sepia .mushaf-page {
 <div id="mushaf" style="display:none">
   <div id="flipbookContainer" style="display:none;width:100%;height:calc(100vh - 200px);"></div>
 <div id="mushafView"><h2 style="text-align:center;color:#FFD700;padding:40px">اختر سورة من القائمة ☰</h2></div>
+<!-- أزرار حجم الخط (وضع الآيات) -->
+<div id="fontControls">
+  <button class="font-ctrl-btn" id="zoom-in" title="تكبير">A+</button>
+  <button class="font-ctrl-btn" id="zoom-out" title="تصغير">A-</button>
 </div>
+
+<!-- أزرار تكبير المصحف (وضع الصور) -->
+
 
 <!-- المشغل السفلي -->
 <div id="player" style="display:none">
@@ -679,18 +750,22 @@ body.theme-sepia .mushaf-page {
 <button class="mushaf-nav-btn mushaf-nav-next" onclick="nextPage()" id="mushafNextBtn">›</button>
 
 <!-- السكريبتات -->
-<script src="parts.js"></script>
-<script src="flipbook.js"></script>
-<script src="zoom.js"></script>
-<script src="juz-complete.js"></script>
-<script src="mushaf.js"></script>
+<div id="prayerToast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,#c8952a,#e8b84b);color:#000;padding:12px 24px;border-radius:30px;font-family:Tajawal,sans-serif;font-weight:bold;display:none;z-index:9999;box-shadow:0 5px 20px rgba(200,149,42,0.5);text-align:center;max-width:90%;">🔔</div>
+<script src="page-flip.browser.js"></script>
 <script src="app.js"></script>
+<script src="position.js"></script>
+<script src="zoom.js"></script>
+<script src="mushaf-zoom.js"></script>
 <script src="prayer.js"></script>
 <script src="adhan-auto.js"></script>
 <script src="adhan-native.js"></script>
+<script src="mushaf.js"></script>
+<script src="flipbook.js"></script>
+<script src="parts.js"></script>
+<script src="juz-complete.js"></script>
 <script src="extras.js"></script>
 <script src="adhkar.js"></script>
 <script src="settings.js"></script>
-  <div id="prayerToast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:linear-gradient(45deg,#c8952a,#e8b84b);color:#000;padding:12px 24px;border-radius:30px;font-family:Tajawal,sans-serif;font-weight:bold;display:none;z-index:9999;box-shadow:0 5px 20px rgba(200,149,42,0.5);text-align:center;max-width:90%;">🔔</div>
+<script src="offline-audio.js"></script>
 </body>
 </html>

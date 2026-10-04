@@ -249,6 +249,8 @@ function displayAyahs(surahInfo) {
     const div = document.createElement("div");
     div.className = "ayah";
     div.dataset.index = index;
+      div.dataset.surah = currentSurah;
+      div.dataset.ayah = ayah.numberInSurah;
 
     const isBookmarked = bookmarks.some(b => b.surah === currentSurah && b.ayah === ayah.numberInSurah);
     div.innerHTML = `
@@ -278,6 +280,9 @@ function displayAyahs(surahInfo) {
     mushafView.appendChild(div);
     if (typeof markSajdaAyahs === "function") { markSajdaAyahs(currentSurah); }
   });
+  
+  // تشغيل مراقب الآيات الظاهرة (لحفظ الموضع)
+  if (typeof observeAyat === "function") setTimeout(observeAyat, 100);
 }
 
 /* ============================================================
@@ -312,8 +317,14 @@ function playAyah() {
   const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
   const url = buildAudioURL(reader, currentSurah, ayahNum, globalAyahNum);
 
-  audio.src = url;
-  audio.play().catch(e => console.warn("خطأ الصوت:", e));
+  if (window.OfflineAudio) {
+    OfflineAudio.setSource(audio, url, reader, currentSurah, ayahNum).then(function (ok) {
+      if (ok) audio.play().catch(e => console.warn("خطأ الصوت:", e));
+    });
+  } else {
+    audio.src = url;
+    audio.play().catch(e => console.warn("خطأ الصوت:", e));
+  }
   isPlaying = true;
   if (playBtn) playBtn.textContent = "⏸";
 }

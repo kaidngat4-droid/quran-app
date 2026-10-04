@@ -57,13 +57,16 @@ function createFlipBookFromImages(images) {
   
   if (typeof St === "undefined" || typeof St.PageFlip === "undefined") return null;
 
-  var screenW = window.innerWidth;
-  var screenH = window.innerHeight - 130;
-  var ratio = 2 / 3;
-  var bookH = screenH;
+  var box = container.getBoundingClientRect();
+  var screenW = box.width || window.innerWidth;
+  var screenH = box.height || (window.innerHeight - 60);
+  var ratio = window.MUSHAF_RATIO || 0.7;
+  var pad = 4;
+  var bookH = screenH - pad * 2;
   var bookW = bookH * ratio;
-  if (bookW > screenW * 0.85) { bookW = screenW * 0.85; bookH = bookW / ratio; }
-  if (bookH > screenH) { bookH = screenH; bookW = bookH * ratio; }
+  if (bookW * 2 > screenW) {                 // وضع صفحة واحدة
+    if (bookW > screenW - pad * 2) { bookW = screenW - pad * 2; bookH = bookW / ratio; }
+  }
 
   window.FLIPBOOK_INSTANCE = new St.PageFlip(container, {
     width: bookW,
@@ -163,3 +166,29 @@ window.addEventListener("resize", function () {
     try { window.FLIPBOOK_INSTANCE.update(); } catch (e) {}
   }
 });
+
+
+/* نسبة الصفحة الحقيقية من الصورة */
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    if (im.naturalWidth && im.naturalHeight) window.MUSHAF_RATIO = im.naturalWidth / im.naturalHeight;
+  };
+  im.src = "pages-img/2.jpg";
+})();
+
+/* إعادة الحساب عند تدوير الشاشة أو فتح/طي الجهاز */
+(function () {
+  var t, lw = window.innerWidth, lh = window.innerHeight;
+  window.addEventListener("resize", function () {
+    clearTimeout(t);
+    t = setTimeout(function () {
+      if (Math.abs(innerWidth - lw) < 40 && Math.abs(innerHeight - lh) < 120) return;
+      lw = innerWidth; lh = innerHeight;
+      if (typeof MUSHAF_MODE !== "undefined" && MUSHAF_MODE &&
+          typeof displayPage === "function" && typeof CURRENT_PAGE !== "undefined") {
+        displayPage(CURRENT_PAGE);
+      }
+    }, 400);
+  });
+})();
