@@ -39,3 +39,8 @@ test-*.png
 # نسخ احتياطية
 *.bak
 *.bak-*
+node_modules/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
