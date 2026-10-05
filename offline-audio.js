@@ -24,13 +24,16 @@
   const pad3 = (n) => String(n).padStart(3, "0");
   const prefix = (f, s) => f + "|" + s + "|";
   const range = (f, s) => IDBKeyRange.bound(prefix(f, s), prefix(f, s) + "\uffff");
-  const urlFor = (f, s, a) => "https://everyayah.com/data/" + f + "/" + pad3(s) + pad3(a) + ".mp3";
+  const urlFor = (f, s, a) => f.startsWith("surah:")
+    ? "https://archive.org/download/" + f.slice(6) + "/" + pad3(s) + ".mp3"
+    : "https://everyayah.com/data/" + f + "/" + pad3(s) + pad3(a) + ".mp3";
 
   function folderFor(readerId) {
     const map = typeof READER_SOURCES !== "undefined" ? READER_SOURCES : null;
     if (!map) return null;
     const info = map[readerId];
     if (!info) return "Alafasy_128kbps";               // نفس الافتراضي في التطبيق
+    if (info.source === "surah") return "surah:" + info.id;
     if (info.source === "everyayah") return info.id;
     if (readerId === "ar.alafasy") return "Alafasy_128kbps";
     return null;
@@ -47,7 +50,8 @@
     try {
       const f = folderFor(readerId);
       if (f && window.indexedDB) {
-        const rec = await run("readonly", (st) => st.get(prefix(f, surah) + ayah));
+        const key = f.startsWith("surah:") ? prefix(f, surah) + "all" : prefix(f, surah) + ayah;
+        const rec = await run("readonly", (st) => st.get(key));
         if (rec && rec.blob) src = URL.createObjectURL(rec.blob);
       }
     } catch (e) {}
@@ -75,6 +79,28 @@
   async function downloadSurah(readerId, surah, onProgress, signal) {
     const f = folderFor(readerId);
     if (!f) throw new Error("القارئ غير مدعوم");
+    if (f.startsWith("surah:")) {
+      const key = prefix(f, surah) + "all";
+      if (await run("readonly", (st) => st.getKey(key))) { onProgress(1, 0, 1); return { done: 1, failed: 0, total: 1, aborted: false }; }
+      try {
+        const r = await fetch(urlFor(f, surah, 1), { signal });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const len = +r.headers.get("content-length") || 0, rd = r.body.getReader(), parts = []; let got = 0;
+        for (;;) {
+          const { done, value } = await rd.read();
+          if (done) break;
+          parts.push(value); got += value.length;
+          if (len) onProgress(got, 0, len);
+        }
+        const blob = new Blob(parts, { type: "audio/mpeg" });
+        await run("readwrite", (st) => st.put({ k: key, f, s: surah, size: blob.size, blob }));
+        onProgress(1, 0, 1);
+        return { done: 1, failed: 0, total: 1, aborted: false };
+      } catch (e) {
+        if (signal.aborted) return { done: 0, failed: 0, total: 1, aborted: true };
+        return { done: 0, failed: 1, total: 1, aborted: false };
+      }
+    }
     const total = AYAH_COUNTS[surah - 1];
     let next = 1, done = 0, failed = 0;
     const worker = async () => {
@@ -175,8 +201,8 @@
         total += s[n].size;
         const row = document.createElement("div"); row.className = "oa-item";
         const lab = document.createElement("span");
-        lab.textContent = surahName(n) + " — " + s[n].n + "/" + AYAH_COUNTS[n - 1] +
-          (s[n].n >= AYAH_COUNTS[n - 1] ? " ✓" : "") + " · " + mb(s[n].size);
+        const whole = f.startsWith("surah:");
+        lab.textContent = surahName(n) + (whole ? " ✓" : " — " + s[n].n + "/" + AYAH_COUNTS[n - 1] + (s[n].n >= AYAH_COUNTS[n - 1] ? " ✓" : "")) + " · " + mb(s[n].size);
         const d = document.createElement("button"); d.textContent = "🗑";
         d.onclick = async () => { await delSurah(f, n); refresh(); };
         row.append(lab, d); list.appendChild(row);
