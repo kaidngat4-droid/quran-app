@@ -82,7 +82,7 @@ jobs:
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
           [ -d pages-img ] && cp -r pages-img www/ || true
-          echo "📁 محتوى www:"
+          echo "www:"
           ls -la www/
 
       - name: Create Android Project
@@ -92,51 +92,10 @@ jobs:
           npx cap sync android
           bash patch-android.sh
 
-      - name: Add Signing Config to build.gradle
+      - name: Set versionCode
         run: |
-          python3 << 'INNEREOF'
-          path = 'android/app/build.gradle'
-          with open(path, 'r', encoding='utf-8') as f:
-              content = f.read()
-          
-          # أضف signingConfigs قبل buildTypes
-          signing_config = """    signingConfigs {
-              release {
-                  storeFile file('quran-release.keystore')
-                  storePassword System.getenv("KEYSTORE_PASSWORD")
-                  keyAlias System.getenv("KEY_ALIAS")
-                  keyPassword System.getenv("KEY_PASSWORD")
-              }
-          }
-          
-          """
-          
-          if 'signingConfigs' not in content:
-              # ابحث عن buildTypes وأضف قبلها
-              if 'buildTypes {' in content:
-                  content = content.replace('    buildTypes {', signing_config + '    buildTypes {', 1)
-          
-          # أضف signingConfig في release
-          if 'signingConfig signingConfigs.release' not in content:
-              content = content.replace(
-                  'release {
-            minifyEnabled false',
-                  'release {
-            minifyEnabled false
-            signingConfig signingConfigs.release',
-                  1
-              )
-          
-          with open(path, 'w', encoding='utf-8') as f:
-              f.write(content)
-          
-          print("✅ تم إضافة signingConfigs")
-          INNEREOF
-          
-          # تحقق
-          grep -A 5 "signingConfigs" android/app/build.gradle
-          echo "---"
-          grep -A 3 "release {" android/app/build.gradle | head -8
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n "versionCode\|versionName\|applicationId" android/app/build.gradle
 
       - name: Generate Icons and Splash
         run: |
@@ -147,19 +106,38 @@ jobs:
       - name: Decode Keystore
         if: ${{ env.KEYSTORE_BASE64 != '' }}
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/quran-release.keystore
-          ls -la android/app/quran-release.keystore
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/quran-release.jks"
+          ls -la "$RUNNER_TEMP/quran-release.jks"
 
-      - name: Build Signed APK
+      - name: Build Release (APK + AAB)
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease --no-daemon
+
+      - name: Sign APK and AAB
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
-          ls -la app/build/outputs/apk/release/
+          set -e
+          KS="$RUNNER_TEMP/quran-release.jks"
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          BT=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)
+          OUT="$GITHUB_WORKSPACE/out"
+          mkdir -p "$OUT"
+          O=android/app/build/outputs
+          "$BT/zipalign" -f -p 4 "$O/apk/release/app-release-unsigned.apk" "$OUT/aligned.apk"
+          "$BT/apksigner" sign --ks "$KS" --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEY_PASSWORD --ks-key-alias "$KEY_ALIAS" --out "$OUT/quran-app-release.apk" "$OUT/aligned.apk"
+          "$BT/apksigner" verify "$OUT/quran-app-release.apk"
+          rm -f "$OUT/aligned.apk" "$OUT/aligned.apk.idsig"
+          cp "$O/bundle/release/app-release.aab" "$OUT/quran-app-release.aab"
+          jarsigner -keystore "$KS" -storepass:env KEYSTORE_PASSWORD -keypass:env KEY_PASSWORD -sigalg SHA256withRSA -digestalg SHA-256 "$OUT/quran-app-release.aab" "$KEY_ALIAS"
+          jarsigner -verify "$OUT/quran-app-release.aab"
+          ls -la "$OUT"
 
       - name: Build Debug APK (fallback)
         if: ${{ env.KEYSTORE_BASE64 == '' }}
@@ -168,22 +146,22 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Upload Debug APK (fallback)
+        if: ${{ env.KEYSTORE_BASE64 == '' }}
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: quran-app-apk
-          path: |
-            android/app/build/outputs/apk/release/*.apk
-            android/app/build/outputs/apk/debug/*.apk
+          name: quran-app-debug
+          path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: warn
 
-      - name: Upload Signed APK (Release)
-        uses: actions/upload-artifact@v4
+      - name: Upload Signed APK and AAB
         if: ${{ env.KEYSTORE_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
         with:
           name: quran-app-release-signed
-          path: android/app/build/outputs/apk/release/*.apk
+          path: |
+            out/*.apk
+            out/*.aab
           if-no-files-found: error
 
       - name: Create Release
@@ -193,29 +171,22 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: "قرآن v1.0.${{ github.run_number }}"
           body: |
-            ## 📖 القرآن الكريم
-            
-            ### ✨ الميزات:
-            - 📖 مصحف كامل (604 صفحة)
-            - 🎙️ تلاوة صوتية (8 قراء)
-            - 🕌 مواقيت الصلاة (صنعاء)
-            - 🔔 أذان تلقائي
-            - 🧭 بوصلة القبلة
-            - 📿 أسماء الله الحسنى
-            - 📥 تنزيل التلاوات (Offline)
-            - 💾 حفظ آخر موضع قراءة
-            - 🤲 الأذكار
-            
-            ### 📝 التحديثات:
-            - الإصدار: v1.0.${{ github.run_number }}
-            - التاريخ: ${{ github.event.head_commit.timestamp }}
-            
-            ### 📦 التثبيت:
+            ## القرآن الكريم
+
+            - مصحف كامل (604 صفحة)
+            - تلاوة صوتية
+            - مواقيت الصلاة
+            - أذان تلقائي
+            - بوصلة القبلة
+            - أسماء الله الحسنى
+            - تنزيل التلاوات (Offline)
+            - الأذكار
+
+            الإصدار: v1.0.${{ github.run_number }}
+
             حمّل APK من الأسفل وثبّته على هاتفك.
-            
-            **ملاحظة:** قد تحتاج لتفعيل "تثبيت من مصادر غير معروفة" في إعدادات هاتفك.
           files: |
-            android/app/build/outputs/apk/release/*.apk
+            out/*.apk
             android/app/build/outputs/apk/debug/*.apk
           draft: false
           prerelease: false
