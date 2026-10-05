@@ -44,3 +44,10 @@ android/.gradle/
 android/build/
 android/app/build/
 android/local.properties
+
+# Keystore - لا يُرفع أبداً
+*.keystore
+*.jks
+keystore.b64
+android/app/quran-release.keystore
+quran-release.keystore
