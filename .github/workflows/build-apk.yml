@@ -90,6 +90,52 @@ jobs:
           npx cap sync android
           bash patch-android.sh
 
+      - name: Add Signing Config to build.gradle
+        run: |
+          python3 << 'INNEREOF'
+          path = 'android/app/build.gradle'
+          with open(path, 'r', encoding='utf-8') as f:
+              content = f.read()
+          
+          # أضف signingConfigs قبل buildTypes
+          signing_config = """    signingConfigs {
+              release {
+                  storeFile file('quran-release.keystore')
+                  storePassword System.getenv("KEYSTORE_PASSWORD")
+                  keyAlias System.getenv("KEY_ALIAS")
+                  keyPassword System.getenv("KEY_PASSWORD")
+              }
+          }
+          
+          """
+          
+          if 'signingConfigs' not in content:
+              # ابحث عن buildTypes وأضف قبلها
+              if 'buildTypes {' in content:
+                  content = content.replace('    buildTypes {', signing_config + '    buildTypes {', 1)
+          
+          # أضف signingConfig في release
+          if 'signingConfig signingConfigs.release' not in content:
+              content = content.replace(
+                  'release {
+            minifyEnabled false',
+                  'release {
+            minifyEnabled false
+            signingConfig signingConfigs.release',
+                  1
+              )
+          
+          with open(path, 'w', encoding='utf-8') as f:
+              f.write(content)
+          
+          print("✅ تم إضافة signingConfigs")
+          INNEREOF
+          
+          # تحقق
+          grep -A 5 "signingConfigs" android/app/build.gradle
+          echo "---"
+          grep -A 3 "release {" android/app/build.gradle | head -8
+
       - name: Generate Icons and Splash
         run: |
           npm install @capacitor/assets --save-dev
