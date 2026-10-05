@@ -771,5 +771,16 @@ body.theme-sepia .mushaf-page {
 <script src="asma.js"></script>
 <script src="settings.js"></script>
 <script src="offline-audio.js"></script>
+
+<script>
+// تسجيل Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js')
+      .then(function(reg) { console.log('✅ SW مسجل:', reg.scope); })
+      .catch(function(err) { console.warn('❌ فشل SW:', err); });
+  });
+}
+</script>
 </body>
 </html>
