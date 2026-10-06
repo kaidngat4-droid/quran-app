@@ -51,3 +51,5 @@ android/local.properties
 keystore.b64
 android/app/quran-release.keystore
 quran-release.keystore
+*.v1
+*.bak

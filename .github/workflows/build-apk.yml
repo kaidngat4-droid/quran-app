@@ -79,6 +79,7 @@ jobs:
           cp asma.js www/
           cp adhan*.mp3 www/ 2>/dev/null || true
           cp page-flip.browser.js www/
+          [ -d fonts ] && cp -r fonts www/ || true
           [ -f cover-pro.html ] && cp cover-pro.html www/ || true
           [ -d images ] && cp -r images www/ || true
           [ -d pages-img ] && cp -r pages-img www/ || true
