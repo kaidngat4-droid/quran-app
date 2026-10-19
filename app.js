@@ -315,22 +315,24 @@ function toggleBookmark(surah, ayah, el) {
    7. تشغيل الآية
    ============================================================ */
 function playAyah() {
-  if (!navigator.onLine) {
-    alert("⚠️ التلاوة تحتاج إنترنت");
-    return;
-  }
   if (!ayahs[currentIndex]) return;
 
   const ayahNum = ayahs[currentIndex].numberInSurah;
   const globalAyahNum = getGlobalAyahNumber(currentSurah, ayahNum);
   const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
   const url = buildAudioURL(reader, currentSurah, ayahNum, globalAyahNum);
+  if (!isSurahReader(reader)) window._surahKey = null;
 
   if (isSurahReader(reader)) {
-    if (audio.src === url && !audio.ended) {
+    const key = reader + "|" + currentSurah;
+    if (window._surahKey === key && !audio.ended) {
       audio.play().catch(e => console.warn("خطأ الصوت:", e));
+    } else if (window.OfflineAudio) {
+      OfflineAudio.setSource(audio, url, reader, currentSurah, ayahNum).then(function (ok) {
+        if (ok) { window._surahKey = key; audio.play().catch(e => console.warn("خطأ الصوت:", e)); }
+      });
     } else {
-      audio.src = url;
+      audio.src = url; window._surahKey = key;
       audio.play().catch(e => console.warn("خطأ الصوت:", e));
     }
   } else if (window.OfflineAudio) {
@@ -384,6 +386,9 @@ function scrollToAyah(index) {
 
 audio.onplay = () => { if (playBtn) playBtn.textContent = "⏸"; };
 audio.onpause = () => { if (playBtn) playBtn.textContent = "▶"; };
+audio.onerror = () => {
+  if (!navigator.onLine) alert("⚠️ هذه التلاوة غير محمّلة وتحتاج إنترنت");
+};
 audio.onended = () => {
   var r = (typeof getSettings === "function" ? getSettings().reader : "");
   if (isSurahReader(r)) { isPlaying = false; if (playBtn) playBtn.textContent = "▶"; return; }
