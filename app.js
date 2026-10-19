@@ -89,6 +89,26 @@ function toggleSidebar() {
   const overlay = document.getElementById("overlay");
   sidebar.classList.toggle("open");
   overlay.classList.toggle("show");
+  if (sidebar.classList.contains("open")) markDownloadedSurahs();
+}
+
+async function markDownloadedSurahs() {
+  if (!window.OfflineAudio || !OfflineAudio.downloaded) return;
+  try {
+    const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
+    const set = await OfflineAudio.downloaded(reader);
+    document.querySelectorAll(".surah-item").forEach(el => {
+      let b = el.querySelector(".dl-mark");
+      const on = set.has(Number(el.dataset.num));
+      if (on && !b) {
+        b = document.createElement("span");
+        b.className = "dl-mark";
+        b.textContent = "✓";
+        b.style.cssText = "font-size:13px;color:#4CAF50;margin-inline-start:8px;font-weight:700";
+        if (el.firstElementChild) el.firstElementChild.appendChild(b);
+      } else if (!on && b) b.remove();
+    });
+  } catch (e) {}
 }
 
 /* ============================================================
@@ -155,6 +175,7 @@ function displaySurahList(surahs) {
     };
     surahList.appendChild(btn);
   });
+  markDownloadedSurahs();
 }
 
 /* ============================================================
@@ -384,10 +405,35 @@ function scrollToAyah(index) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-audio.onplay = () => { if (playBtn) playBtn.textContent = "⏸"; };
+const _pre = new Audio(); _pre.preload = "auto";
+async function prefetchNext() {
+  try {
+    if (!navigator.onLine || !ayahs[currentIndex + 1]) return;
+    const reader = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
+    if (isSurahReader(reader)) return;
+    const next = ayahs[currentIndex + 1].numberInSurah;
+    if (window.OfflineAudio && OfflineAudio.has && await OfflineAudio.has(reader, currentSurah, next)) return;
+    _pre.src = buildAudioURL(reader, currentSurah, next, getGlobalAyahNumber(currentSurah, next));
+  } catch (e) {}
+}
+audio.onplay = () => { if (playBtn) playBtn.textContent = "⏸"; prefetchNext(); };
 audio.onpause = () => { if (playBtn) playBtn.textContent = "▶"; };
+let _offlineWarned = false;
+function _warnOnce(msg) {
+  if (_offlineWarned) return;
+  _offlineWarned = true;
+  alert(msg);
+  setTimeout(() => { _offlineWarned = false; }, 5000);
+}
 audio.onerror = () => {
-  if (!navigator.onLine) alert("⚠️ هذه التلاوة غير محمّلة وتحتاج إنترنت");
+  if (!audio.getAttribute("src")) return;
+  isPlaying = false;
+  if (playBtn) playBtn.textContent = "▶";
+  const r = (typeof getSettings === "function" ? getSettings().reader : readerSelect.value);
+  const n = (!isSurahReader(r) && ayahs[currentIndex]) ? " (الآية " + ayahs[currentIndex].numberInSurah + ")" : "";
+  _warnOnce(navigator.onLine
+    ? "⚠️ تعذّر تشغيل التلاوة" + n + " — تحقق من الاتصال"
+    : "⚠️ هذه التلاوة غير محمّلة وتحتاج إنترنت" + n);
 };
 audio.onended = () => {
   var r = (typeof getSettings === "function" ? getSettings().reader : "");

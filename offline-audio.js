@@ -208,6 +208,7 @@
         row.append(lab, d); list.appendChild(row);
       });
       $("oaTotal").textContent = "(" + mb(total) + ")";
+      if (typeof markDownloadedSurahs === "function") markDownloadedSurahs();
       if (!keys.length) list.textContent = "لا شيء محمَّل بعد";
     }
 
@@ -242,6 +243,26 @@
     };
   }
 
-  window.OfflineAudio = { setSource, downloadSurah, stats };
+  async function has(readerId, surah, ayah) {
+    try {
+      const f = folderFor(readerId);
+      if (!f || !window.indexedDB) return false;
+      const key = f.startsWith("surah:") ? prefix(f, surah) + "all" : prefix(f, surah) + ayah;
+      return !!(await run("readonly", (st) => st.getKey(key)));
+    } catch (e) { return false; }
+  }
+  async function downloaded(readerId) {
+    const out = new Set();
+    try {
+      const f = folderFor(readerId);
+      if (!f || !window.indexedDB) return out;
+      const s = await stats(f);
+      Object.keys(s).forEach((n) => {
+        if (f.startsWith("surah:") || s[n].n >= AYAH_COUNTS[n - 1]) out.add(Number(n));
+      });
+    } catch (e) {}
+    return out;
+  }
+  window.OfflineAudio = { setSource, downloadSurah, stats, has, downloaded };
   if (document.body) buildUI(); else document.addEventListener("DOMContentLoaded", buildUI);
 })();
