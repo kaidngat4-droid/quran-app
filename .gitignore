@@ -14,7 +14,6 @@ Thumbs.db
 # Mushaf images (كبيرة — تُجلب في CI)
 
 # Built files (تُبنى في CI)
-www/
 
 # Backup files
 *.bak
@@ -54,3 +53,6 @@ quran-release.keystore
 *.v1
 *.bak
 .build-number
+www/pages-img/
+www/images/
+www/*.mp3
