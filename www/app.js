@@ -288,7 +288,7 @@ function displayAyahs(surahInfo) {
       ${ayah.text}
       <span class="num">${ayah.numberInSurah}</span>
       <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
-        <button onclick="event.stopPropagation(); openTafsir(${currentSurah}, ${ayah.numberInSurah})" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📚 تفسير</button>
+        <button onclick="event.stopPropagation(); openLocalTafsir(${currentSurah}, ${ayah.numberInSurah})" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📚 تفسير</button>
 <button onclick="event.stopPropagation(); toggleTranslation(${currentSurah}, ${ayah.numberInSurah}, this)" style="background:rgba(0,150,255,0.15);border:1px solid rgba(0,150,255,0.3);color:#00BFFF;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">🇬🇧 ترجمة</button>
 <div id="trans-${currentSurah}-${ayah.numberInSurah}" style="display:none; margin-top:10px; padding:10px; background:rgba(0,150,255,0.05); border-right:3px solid #00BFFF; border-radius:8px; font-family:system-ui; direction:ltr; text-align:left; color:#e0e0e0; font-size:14px; line-height:1.6;"></div>
         <button onclick="event.stopPropagation(); shareAyah('${typeof surahInfo !== "undefined" && surahInfo ? surahInfo.name : ""}', ${ayah.numberInSurah}, '${ayah.text.replace(/'/g, "\\'")}')" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📤 مشاركة</button>
@@ -520,3 +520,66 @@ async function toggleTranslation(surah, ayah, btn) {
     }
     el.style.display = 'block';
 }
+
+
+// --- دالة التفسير المحلي (تفسير ابن كثير) ---
+var _ibnKathirData = null;
+
+async function openLocalTafsir(surah, ayah) {
+    var modal = document.getElementById('tafsirModal');
+    if (modal) modal.style.display = 'flex';
+    
+    var contentEl = document.getElementById('tafsirContent') || document.querySelector('.tafsir-content');
+    if (!contentEl) { 
+        // إنشاء نافذة بسيطة إذا لم تكن موجودة
+        var div = document.createElement('div');
+        div.id = 'tafsirContent';
+        div.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:500px;max-height:80vh;overflow-y:auto;background:#1a1a2e;color:#fff;padding:20px;border-radius:15px;z-index:9999;border:2px solid #FFD700;font-family:Tajawal,sans-serif;line-height:1.8;';
+        document.body.appendChild(div);
+        contentEl = div;
+    }
+    
+    contentEl.style.display = 'block';
+    contentEl.innerHTML = '⏳ جاري تحميل التفسير...';
+    
+    if (!_ibnKathirData) {
+        try {
+            const res = await fetch('tafsir-ibn-kathir.json');
+            _ibnKathirData = await res.json();
+        } catch (e) {
+            contentEl.innerHTML = '❌ فشل تحميل التفسير.';
+            return;
+        }
+    }
+    
+    var key = surah + ':' + ayah;
+    var tafsirText = _ibnKathirData[key];
+    
+    if (tafsirText) {
+        contentEl.innerHTML = '<h3 style="color:#FFD700;text-align:center;margin-bottom:15px">📖 تفسير ابن كثير</h3><p style="font-size:15px;text-align:justify;direction:rtl;">' + tafsirText + '</p><button onclick="this.parentElement.style.display=\'none\'" style="display:block;margin:15px auto 0;padding:8px 20px;background:#FFD700;color:#000;border:none;border-radius:8px;cursor:pointer;font-family:Tajawal">إغلاق</button>';
+    } else {
+        contentEl.innerHTML = '❌ التفسير غير متوفر لهذه الآية.';
+    }
+}
+
+
+// --- تفعيل الاختصارات السريعة (PWA Shortcuts) ---
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var params = new URLSearchParams(window.location.search);
+        var view = params.get('view');
+        
+        if (view === 'mushaf') {
+            console.log("📖 فتح المصحف عبر الاختصار");
+            if (typeof toggleMushafMode === 'function' && typeof MUSHAF_MODE !== 'undefined' && !MUSHAF_MODE) {
+                toggleMushafMode();
+            }
+        } else if (view === 'tafsir') {
+            console.log("📚 فتح التفسير عبر الاختصار");
+            // فتح نافذة التفسير (يمكنك تخصيصها لاحقاً)
+        } else if (view === 'qibla') {
+            console.log("🧭 فتح القبلة عبر الاختصار");
+            if (typeof openQibla === 'function') openQibla();
+        }
+    }, 1000); // انتظار تحميل التطبيق
+});
