@@ -1,3 +1,22 @@
+
+// --- إدارة الثيم (الوضع الليلي) ---
+function applyTheme(themeName) {
+    document.documentElement.setAttribute('data-theme', themeName);
+    localStorage.setItem('app_theme', themeName);
+    
+    // إزالة الكلاسات القديمة وإضافة الجديد
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-night', 'theme-brown');
+    if (themeName === 'dark') document.body.classList.add('theme-dark');
+    else if (themeName === 'night') document.body.classList.add('theme-night');
+    else if (themeName === 'brown') document.body.classList.add('theme-brown');
+    else document.body.classList.add('theme-light');
+}
+
+function loadTheme() {
+    var savedTheme = localStorage.getItem('app_theme') || 'light';
+    applyTheme(savedTheme);
+}
+
 const READERS=[{id:"ar.alafasy",name:"مشاري راشد العفاسي",country:"الكويت",flag:"🇰🇼"},{id:"ar.abdulbasitmurattal",name:"عبد الباسط عبد الصمد",country:"مصر",flag:"🇪🇬"},{id:"ar.abdurrahmaansudais",name:"عبد الرحمن السديس",country:"السعودية",flag:"🇸🇦"},{id:"ar.abdullahbasfar",name:"عبد الله بصفر",country:"السعودية",flag:"🇸🇦"},{id:"ar.husary",name:"محمود خليل الحصري",country:"مصر",flag:"🇪🇬"},{id:"ar.minshawi",name:"محمد صديق المنشاوي",country:"مصر",flag:"🇪🇬"},{id:"ar.muhammadjibreel",name:"محمد جبريل",country:"مصر",flag:"🇪🇬"},{id:"ar.mahermuaiqly",name:"ماهر المعيقلي",country:"السعودية",flag:"🇸🇦"},{id:"ar.shaatree",name:"أبو بكر الشاطري",country:"السعودية",flag:"🇸🇦"},{id:"ar.hudhaify",name:"علي الحذيفي",country:"السعودية",flag:"🇸🇦"},{id:"ar.ahmedajamy",name:"أحمد العجمي",country:"السعودية",flag:"🇸🇦"},{id:"ar.hanirifai",name:"هاني الرفاعي",country:"السعودية",flag:"🇸🇦"},{id:"ar.muhammadayyoub",name:"محمد أيوب",country:"السعودية",flag:"🇸🇦"},{id:"ar.aymanswoaid",name:"أيمن سويد",country:"سوريا",flag:"🇸🇾"},{id:"ar.muhammadhusaynamer",name:"محمد حسين عامر",country:"اليمن",flag:"🇾🇪"}];
 
 const FONTS=[{id:"Amiri Quran",name:"أميري قرآن"},{id:"Scheherazade New",name:"شهرزاد"},{id:"Noto Naskh Arabic",name:"نسخ"},{id:"Lateef",name:"لطيف"},{id:"Tajawal",name:"تجوّل"}];

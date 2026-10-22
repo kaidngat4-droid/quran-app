@@ -289,6 +289,8 @@ function displayAyahs(surahInfo) {
       <span class="num">${ayah.numberInSurah}</span>
       <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
         <button onclick="event.stopPropagation(); openTafsir(${currentSurah}, ${ayah.numberInSurah})" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📚 تفسير</button>
+<button onclick="event.stopPropagation(); toggleTranslation(${currentSurah}, ${ayah.numberInSurah}, this)" style="background:rgba(0,150,255,0.15);border:1px solid rgba(0,150,255,0.3);color:#00BFFF;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">🇬🇧 ترجمة</button>
+<div id="trans-${currentSurah}-${ayah.numberInSurah}" style="display:none; margin-top:10px; padding:10px; background:rgba(0,150,255,0.05); border-right:3px solid #00BFFF; border-radius:8px; font-family:system-ui; direction:ltr; text-align:left; color:#e0e0e0; font-size:14px; line-height:1.6;"></div>
         <button onclick="event.stopPropagation(); shareAyah('${typeof surahInfo !== "undefined" && surahInfo ? surahInfo.name : ""}', ${ayah.numberInSurah}, '${ayah.text.replace(/'/g, "\\'")}')" style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#FFD700;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:Tajawal">📤 مشاركة</button>
       </div>
     `;
@@ -482,3 +484,39 @@ if (localStorage.getItem("theme") === "light") {
   if (btn) btn.textContent = "☀️";
 }
 
+
+// --- دالة عرض الترجمة الإنجليزية ---
+let globalTranslationData = null;
+
+async function toggleTranslation(surah, ayah, btn) {
+    var el = document.getElementById(`trans-${surah}-${ayah}`);
+    if (!el) return;
+    
+    // إذا كانت الترجمة معروضة، اخفها
+    if (el.style.display === 'block') {
+        el.style.display = 'none';
+        return;
+    }
+    
+    // تحميل ملف الترجمة إذا لم يكن محملاً
+    if (!globalTranslationData) {
+        el.style.display = 'block';
+        el.innerHTML = '⏳ جاري تحميل الترجمة...';
+        try {
+            const res = await fetch('translation-en.json');
+            const j = await res.json(); globalTranslationData = j.quran || j;
+        } catch (e) {
+            el.innerHTML = '❌ فشل تحميل الترجمة.';
+            return;
+        }
+    }
+    
+    // البحث عن الآية في ملف الترجمة (الصيغة الجديدة)
+    var verseData = globalTranslationData.find(v => v.chapter === surah && v.verse === ayah);
+    if (verseData && verseData.text) {
+        el.innerHTML = '<strong style="color:#00BFFF">Sahih International:</strong><br>' + verseData.text;
+    } else {
+        el.innerHTML = '❌ الترجمة غير متوفرة لهذه الآية.';
+    }
+    el.style.display = 'block';
+}

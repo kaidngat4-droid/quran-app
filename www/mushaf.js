@@ -15,7 +15,7 @@ var BLANK_IMG = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAA
 function buildImageList(centerPage) {
   var list = [];
   for (var p = 1; p <= 604; p++) {
-    list.push("pages-img/" + p + ".jpg");
+    list.push("pages-img-compressed/" + p + ".webp");
   }
   return list;
 }
@@ -77,7 +77,7 @@ async function displayPage(pageNum) {
     var view = document.getElementById("mushafView");
     if (view) {
       view.style.display = "block";
-      var imgSrc = "pages-img/" + pageNum + ".jpg";
+      var imgSrc = "pages-img-compressed/" + pageNum + ".webp";
       view.innerHTML = '<div class="mushaf-page mushaf-page-img" data-page="' + pageNum + '"><img src="' + imgSrc + '" class="mushaf-image" alt="صفحة ' + pageNum + '"></div>';
     }
   }
@@ -385,7 +385,10 @@ async function displayPageBySurah(surahNum) {
     if (!pageData || pageData.length === 0) continue;
     for (var i = 0; i < pageData.length; i++) {
       var s = parseInt(pageData[i].key.split(":")[0]);
-      if (s === surahNum) { displayPage(page); return; }
+      if (s === surahNum) { 
+          setTimeout(function() { displayPage(page); }, 200);
+          return; 
+      }
     }
   }
 }
@@ -428,6 +431,6 @@ function preloadNearby(page) {
     if (_preloaded[p]) continue;
     _preloaded[p] = true;
     var im = new Image();
-    im.src = "pages-img/" + p + ".jpg";
+    im.src = "pages-img-compressed/" + p + ".webp";
   }
 }

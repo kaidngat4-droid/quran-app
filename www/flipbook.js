@@ -174,7 +174,7 @@ window.addEventListener("resize", function () {
   im.onload = function () {
     if (im.naturalWidth && im.naturalHeight) window.MUSHAF_RATIO = im.naturalWidth / im.naturalHeight;
   };
-  im.src = "pages-img/2.jpg";
+  im.src = "pages-img-compressed/2.webp";
 })();
 
 /* إعادة الحساب عند تدوير الشاشة أو فتح/طي الجهاز */

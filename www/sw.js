@@ -1,10 +1,10 @@
-const CACHE_NAME = 'quran-app-v42';
+const CACHE_NAME = 'quran-app-v107';
 const IMG_CACHE = 'quran-img-v1';
 const IMG_LIMIT = 700;
 
 const CORE = [
   './', './index.html', './manifest.json', './style.css',
-  './quran.json', './pages.json', './page-flip.browser.js',
+  './quran.json', './translation-en.json', './pages.json', './page-flip.browser.js',
   './app.js', './offline-audio.js', './mushaf.js', './flipbook.js', './mushaf-zoom.js', './zoom.js',
   './position.js', './settings.js', './prayer.js', './adhkar.js', './extras.js',
   './parts.js', './juz-complete.js', './adhan-auto.js', './adhan-native.js',
