@@ -33,7 +33,12 @@ function playAdhan(prayerName) {
   stopAdhan();
   try { if (typeof audio !== "undefined" && audio && !audio.paused) audio.pause(); } catch (e) {}
 
-  var src = (prayerName === "الفجر") ? "adhan-fajr.mp3" : "adhan.mp3";
+    var src = "adhan.mp3"; // الافتراضي
+  if (prayerName.includes("الفجر") || prayerName.includes("Fajr")) src = "adhan-fajr.mp3";
+  else if (prayerName.includes("الظهر") || prayerName.includes("Dhuhr")) src = "adhan-new.mp3"; // الأذان القديم للظهر
+  else if (prayerName.includes("العصر") || prayerName.includes("Asr")) src = "adhan-asr.mp3";
+  else if (prayerName.includes("المغرب") || prayerName.includes("Maghrib")) src = "adhan-maghrib.mp3";
+  else if (prayerName.includes("العشاء") || prayerName.includes("Isha")) src = "adhan-isha.mp3";
   _adhanAudio = new Audio(src);
   _adhanAudio.onerror = function () {
     if (src !== "adhan.mp3") {
