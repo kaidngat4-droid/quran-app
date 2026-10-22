@@ -83,18 +83,47 @@ document.addEventListener("visibilitychange", function() {
 // ===== استعادة الموضع =====
 async function _restorePosition() {
   if (!_store) await _initStore();
+  
+  // تم تعطيل استعادة وضع المصحف نهائياً لحل مشكلة التكبير
+  // إذا كان المستخدم في وضع المصحف سابقاً، سنبدأ من الصفحة 1
   try {
     if (localStorage.getItem("lastMode") === "mushaf" && typeof toggleMushafMode === "function" && !MUSHAF_MODE) {
-      var lp = parseInt(localStorage.getItem("lastPage"));
-      if (lp > 0) CURRENT_PAGE = lp;
-      console.log("📂 استعادة المصحف، صفحة:", CURRENT_PAGE);
+      console.log("📂 تم تعطيل استعادة المصحف، البدء من الصفحة 1");
+      
+      // تصفير كل قيم التكبير المحفوظة
+      try { localStorage.setItem("mushafZoom", "1"); } catch (e) {}
+      if (typeof MZ_SCALE !== "undefined") MZ_SCALE = 1;
+      
+      // مسح الحاوية وتصفير التمرير
+      var containers = document.querySelectorAll('.mushaf-container, .mushaf-viewer, #mushafViewer, .flipbook-container, .page-container');
+      containers.forEach(function(el) {
+          el.innerHTML = '';
+          el.style.zoom = 1;
+          el.style.transform = 'none';
+          el.style.webkitTransform = 'none';
+          el.scrollTop = 0;
+          el.scrollLeft = 0;
+      });
+      
+      window.scrollTo(0, 0);
+      
+      // فتح المصحف على الصفحة الأولى
+      if (typeof CURRENT_PAGE !== "undefined") CURRENT_PAGE = 1;
+      
+      // إجبار التكبير على 1
+      if (typeof window.MZ_reset === "function") {
+          try { window.MZ_reset(); } catch(e) {}
+      }
+      
       toggleMushafMode();
       return;
     }
-  } catch (e) {}
+  } catch (e) { console.error(e); }
+  
+  // استعادة الوضع النصي (السور) بشكل طبيعي
   var pos = await _store.get("lastPos");
   if (!pos || !pos.surah) return;
-  console.log("📂 استعادة الموضع:", pos);
+  console.log("📂 استعادة الموضع النصي:", pos);
   if (typeof loadSurah === "function") {
     await loadSurah(pos.surah);
     setTimeout(function() {
@@ -102,7 +131,6 @@ async function _restorePosition() {
       if (target) {
         target.scrollIntoView({ block: "center", behavior: "smooth" });
         target.classList.add("active");
-        console.log("✅ تم الانتقال إلى الآية " + pos.ayah);
       }
     }, 800);
   }

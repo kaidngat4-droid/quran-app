@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+// مسح التخزين المحلي بالكامل لمنع أي تكبير عالق
+try {
+    localStorage.removeItem("mushafZoom");
+    localStorage.removeItem("lastPage");
+    localStorage.setItem("mushafZoom", "1");
+} catch(e) {}
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>📖 القرآن الكريم</title>

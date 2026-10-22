@@ -61,11 +61,10 @@ setInterval(function() {
   
   if (true) {
     controls.style.display = "flex";
-    var saved = localStorage.getItem("mushafZoom");
-    if (saved && saved !== "1" && MZ_SCALE === 1) {
-      MZ_SCALE = parseFloat(saved) || 1;
-      MZ_apply();
-    }
+    // إجبار التكبير على 100% عند فتح المصحف
+    MZ_SCALE = 1;
+    localStorage.setItem("mushafZoom", "1");
+    MZ_apply();
   } else {
     controls.style.display = "none";
   }

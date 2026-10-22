@@ -17,7 +17,7 @@
 
   // ✅ تحقق أننا في وضع المصحف
   function isMushafMode() {
-    return typeof MUSHAF_MODE !== "undefined" && MUSHAF_MODE;
+    return false; // تم تعطيل التكبير في وضع المصحف
   }
 
   function getTarget() {

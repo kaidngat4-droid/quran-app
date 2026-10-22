@@ -61,6 +61,9 @@ function createFlipBookFromImages(images) {
   var screenW = box.width || window.innerWidth;
   var screenH = box.height || (window.innerHeight - 60);
   var ratio = window.MUSHAF_RATIO || 0.7;
+  if (!isFinite(ratio) || ratio < 0.3 || ratio > 1.2) ratio = 0.7;
+  if (screenW < 50 || screenH < 50) { screenW = window.innerWidth; screenH = window.innerHeight - 200; }
+  console.log("📐 flipbook dims:", screenW, screenH, ratio);
   var pad = 4;
   var bookH = screenH - pad * 2;
   var bookW = bookH * ratio;
@@ -80,7 +83,7 @@ function createFlipBookFromImages(images) {
     flippingTime: 700,
     usePortrait: true,
     startZIndex: 0,
-    autoSize: true,
+    autoSize: false,
     maxShadowOpacity: 0.4,
     showCover: false,
     mobileScrollSupport: false,
@@ -90,6 +93,11 @@ function createFlipBookFromImages(images) {
     showPageCorners: true
   });
 
+  // destroy الأصلي يحذف الحاوية نفسها (block.remove)، فنستبدله بتنظيف آمن
+  window.FLIPBOOK_INSTANCE.destroy = function () {
+    try { this.getUI().removeHandlers(); } catch (e) {}
+    try { this.block.innerHTML = ""; } catch (e) {}
+  };
   window.FLIPBOOK_INSTANCE.loadFromImages(images);
   window.FLIPBOOK_INSTANCE.on("flip", function (e) {
     if (typeof onFlipBookChange === "function") onFlipBookChange(e);
@@ -111,7 +119,7 @@ function applyFontSizeToMushaf() {
   
   // حوّل حجم الخط (16-48) إلى نسبة تكبير (0.7 - 1.8)
   // 26 = 100% (الحجم العادي)
-  var scale = 0.7 + (fontSize - 16) / 32 * 1.1;
+  var scale = 1;
   
   console.log("📖 تطبيق الحجم:", fontSize, "px → scale:", scale.toFixed(2));
   
